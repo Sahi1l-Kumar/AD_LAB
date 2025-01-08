@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resume</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="resume">
+      <div class="header">
+        <div class="header-content">
+          <img
+            src="https://media.licdn.com/dms/image/v2/D5603AQG6wW6sk2yEPw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1690741429138?e=1741824000&v=beta&t=1xAsaw7R_IYaFKPIxBMpqs7Lf9102-2nCswOVl71N2A"
+            alt="profile photo"
+            class="profile-photo"
+          />
+          <h1>Sahil Kumar</h1>
+        </div>
+        <div class="contact-info">
+          <p><i class="fa-solid fa-envelope"></i> sk015221@gmail.com</p>
+          <p><i class="fa-solid fa-phone"></i> +91 7368970803</p>
+          <p><i class="fa-solid fa-location-dot"></i> Jamshedpur, Jharkhand</p>
+          <p>
+            <i class="fa-brands fa-linkedin"></i>
+            <a href="www.linkedin.com/in/sahi1l-kumar">LinkedIn</a>
+          </p>
+          <p>
+            <i class="fa-brands fa-github"></i>
+            <a href="https://github.com/Sahi1l-Kumar">Github</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">
+          <i class="fa-solid fa-user"></i>Professional Summary
+        </h2>
+        <p>
+          I am a dedicated software engineering student with a passion for
+          open-source development and community-driven projects. Beyond coding,
+          I enjoy immersing myself in music, spending quality time with friends,
+          listening to podcasts, and indulging in a good book.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">
+          <i class="fa-solid fa-briefcase"></i>Work Experience
+        </h2>
+        <div class="job">
+          <div class="job-title">Open Source Contributor</div>
+          <div class="job-company">The Palisadoes Foundation</div>
+          <div class="job-date">Feb 2024 - May 2024</div>
+          <div class="job-description">
+            Led the development of a core feature in the platform regarding
+            membership requests. Redesigned a lot of interfaces and wrote unit
+            tests for each of them.
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">
+          <i class="fa-solid fa-diagram-project"></i>Projects
+        </h2>
+        <div class="project">
+          <div class="project-title">
+            <a href="https://github.com/Sahi1l-Kumar/QueryHive" target="_blank"
+              >Query Hive</a
+            >
+          </div>
+          <div class="project-description">
+            <p>
+              QueryHive - community-driven platform inspired by StackOverflow,
+              enhanced with AI-powered answers, gamification, recommendations,
+              and more.
+            </p>
+            <br />
+            <p>
+              The project uses MongoDB for a robust database layer, NextAuth
+              (Auth.js) for versatile authentication options (Email/Password,
+              GitHub, Google), and sleek styling with TailwindCSS and ShadCN UI.
+              QueryHive enables developers to ask questions, post answers,
+              leverage AI for responses, vote, organize content, contribute,
+              discover jobs, and explore recommended topics—all while engaging
+              with gamified elements like badges and rewards.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">
+          <i class="fa-solid fa-graduation-cap"></i>Education
+        </h2>
+        <div class="job">
+          <div class="job-title">
+            Bachelor of Technology in Electronics and Computer Science
+            Engineering
+          </div>
+          <div class="job-company">
+            Kalinga Institute of Industrial Technology
+          </div>
+          <div class="job-date">2022 - 2026</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title"><i class="fa-solid fa-wrench"></i>Skills</h2>
+        <div class="skills" id="skills"></div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { skillIcons } from "./icons.js";
+
+      const skillsContainer = document.getElementById("skills");
+
+      const skills = [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "TypeScript",
+        "React",
+        "Node.js",
+        "Python",
+        "AWS",
+        "Docker",
+        "Git",
+        "SQL",
+        "Nextjs",
+        "Tailwindcss",
+        "Websockets",
+        "GraphQL",
+      ];
+
+      skills.forEach((skill) => {
+        const skillDiv = document.createElement("div");
+        skillDiv.className = "skill";
+
+        const iconClass = skillIcons[skill] || "";
+        skillDiv.innerHTML = `<i class="${iconClass}"></i> ${skill}`;
+
+        skillsContainer.appendChild(skillDiv);
+      });
+    </script>
+  </body>
+</html>

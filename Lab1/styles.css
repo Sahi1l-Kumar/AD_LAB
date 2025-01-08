@@ -1,0 +1,259 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary-color: #2c3e50;
+  --accent-color: #3498db;
+  --text-color: #2c3e50;
+  --light-bg: #f8f9fa;
+  --transition: all 0.3s ease;
+}
+
+body {
+  background: #f0f0f0;
+  padding: 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: var(--text-color);
+}
+
+.resume {
+  max-width: 850px;
+  margin: 0 auto;
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: var(--transition);
+}
+
+.resume:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.header {
+  text-align: left;
+  margin-bottom: 40px;
+  padding: 20px;
+  border-bottom: 3px solid var(--accent-color);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.profile-photo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.header h1 {
+  color: var(--primary-color);
+  font-size: 2.8em;
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.contact-info {
+  display: flex;
+  justify-content: left;
+  flex-wrap: wrap;
+  gap: 20px;
+  color: #666;
+  font-size: 0.95em;
+}
+
+.contact-info p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.contact-info i {
+  color: var(--accent-color);
+}
+
+.contact-info a {
+  color: #666;
+}
+
+.section {
+  margin-bottom: 30px;
+  padding: 20px;
+  border-radius: 8px;
+  transition: var(--transition);
+}
+
+.section:hover {
+  background: var(--light-bg);
+}
+
+.section-title {
+  color: var(--primary-color);
+  font-size: 1.4em;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title i {
+  color: var(--accent-color);
+  width: 24px;
+}
+
+.job {
+  margin-bottom: 25px;
+  padding-left: 20px;
+  border-left: 3px solid var(--accent-color);
+  transition: var(--transition);
+}
+
+.job:hover {
+  border-left-width: 5px;
+}
+
+.job-title {
+  font-weight: 600;
+  color: var(--primary-color);
+  font-size: 1.1em;
+  margin-bottom: 5px;
+}
+
+.job-company {
+  color: var(--accent-color);
+  font-weight: 600;
+  font-size: 1em;
+  margin-bottom: 5px;
+}
+
+.job-date {
+  color: #666;
+  font-size: 0.9em;
+  margin-bottom: 8px;
+}
+
+.job-description {
+  color: #555;
+  font-size: 0.95em;
+  line-height: 1.6;
+}
+
+.project {
+  margin-bottom: 25px;
+  padding-left: 20px;
+  border-left: 3px solid var(--accent-color);
+  transition: var(--transition);
+}
+
+.project:hover {
+  border-left-width: 5px;
+}
+
+.project-title {
+  font-weight: 600;
+  color: var(--primary-color);
+  font-size: 1.1em;
+  margin-bottom: 5px;
+}
+
+.project-title a {
+  text-decoration: none;
+  color: var(--accent-color);
+  transition: var(--transition);
+}
+
+.project-title a:hover {
+  text-decoration: underline;
+}
+
+.project-description {
+  color: #555;
+  font-size: 0.95em;
+  line-height: 1.6;
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.skill {
+  background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: var(--accent-color);
+  font-size: 0.9em;
+  font-weight: 500;
+  transition: var(--transition);
+  border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+.skill i {
+  margin-right: 8px;
+  font-size: 1.2em;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.skill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(52, 152, 219, 0.2);
+}
+
+@media (max-width: 768px) {
+  .resume {
+    padding: 25px;
+  }
+
+  .header h1 {
+    font-size: 2.2em;
+  }
+
+  .section-title {
+    font-size: 1.2em;
+  }
+
+  .contact-info {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+
+  .resume {
+    padding: 20px;
+  }
+
+  .header h1 {
+    font-size: 1.8em;
+  }
+
+  .section {
+    padding: 15px;
+  }
+
+  .job {
+    padding-left: 15px;
+  }
+
+  .skill {
+    padding: 6px 12px;
+  }
+}
