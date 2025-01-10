@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultText = document.querySelector(".result-text");
   const tryAgainBtn = document.querySelector(".try-again-btn");
 
-  // Handle drag and drop events
   ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
     dropZone.addEventListener(eventName, preventDefaults);
   });
@@ -33,7 +32,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Handle file drop
   dropZone.addEventListener("drop", (e) => {
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith("image/")) {
@@ -41,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Handle click to upload
   dropZone.addEventListener("click", () => {
     fileInput.click();
   });
@@ -62,12 +59,10 @@ document.addEventListener("DOMContentLoaded", () => {
     reader.readAsDataURL(file);
   }
 
-  // Simulate classification (replace this with actual model integration)
   classifyBtn.addEventListener("click", async () => {
     classifyBtn.disabled = true;
     classifyBtn.textContent = "Analyzing...";
 
-    // Prepare the file to send to the backend
     const file = fileInput.files[0];
     if (!file) {
       alert("No image selected!");
@@ -80,7 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.append("image", file);
 
     try {
-      // Send the image to the backend for classification
       const response = await fetch("/classify", {
         method: "POST",
         body: formData,
@@ -92,8 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = await response.json();
 
-      // Update the result display
-      const pet = data.category.toLowerCase(); // Expected categories: "Cat" or "Dog"
+      const pet = data.category.toLowerCase();
 
       uploadContainer.classList.add("hidden");
       previewContainer.classList.add("hidden");
@@ -116,9 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Try again button
   tryAgainBtn.addEventListener("click", () => {
-    // Reset everything
     uploadContainer.classList.remove("hidden");
     dropZone.style.display = "block";
     previewContainer.classList.add("hidden");
