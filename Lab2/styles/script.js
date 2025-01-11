@@ -33,9 +33,31 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   dropZone.addEventListener("drop", (e) => {
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith("image/")) {
+    const items = e.dataTransfer.items;
+    let file = null;
+
+    if (items) {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].kind === "file" && items[i].type.startsWith("image/")) {
+          file = items[i].getAsFile();
+          break;
+        }
+      }
+    } else {
+      // Use DataTransfer interface to access the file
+      const files = e.dataTransfer.files;
+      for (let i = 0; i < files.length; i++) {
+        if (files[i].type.startsWith("image/")) {
+          file = files[i];
+          break;
+        }
+      }
+    }
+
+    if (file) {
       handleFile(file);
+    } else {
+      alert("Please drop an image file");
     }
   });
 
@@ -44,8 +66,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   fileInput.addEventListener("change", (e) => {
-    if (e.target.files.length > 0) {
+    if (
+      e.target.files.length > 0 &&
+      e.target.files[0].type.startsWith("image/")
+    ) {
       handleFile(e.target.files[0]);
+    } else {
+      alert("Please select an image file");
     }
   });
 
@@ -59,34 +86,13 @@ document.addEventListener("DOMContentLoaded", () => {
     reader.readAsDataURL(file);
   }
 
-  classifyBtn.addEventListener("click", async () => {
+  classifyBtn.addEventListener("click", () => {
     classifyBtn.disabled = true;
     classifyBtn.textContent = "Analyzing...";
 
-    const file = fileInput.files[0];
-    if (!file) {
-      alert("No image selected!");
-      classifyBtn.disabled = false;
-      classifyBtn.textContent = "Classify Pet";
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("image", file);
-
-    try {
-      const response = await fetch("/classify", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to classify the image. Please try again.");
-      }
-
-      const data = await response.json();
-
-      const pet = data.category.toLowerCase();
+    setTimeout(() => {
+      const pets = ["cat", "dog"];
+      const randomPet = pets[Math.floor(Math.random() * pets.length)];
 
       uploadContainer.classList.add("hidden");
       previewContainer.classList.add("hidden");
@@ -94,19 +100,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
       setTimeout(() => {
         result.classList.add("visible");
-        petType.textContent = pet;
-        petIcon.className = `pet-icon ${pet}`;
+        petType.textContent = randomPet;
+        petIcon.className = `pet-icon ${randomPet}`;
 
         setTimeout(() => {
           petIcon.classList.add("visible");
           resultText.classList.add("visible");
         }, 300);
       }, 100);
-    } catch (error) {
-      alert(error.message);
-      classifyBtn.disabled = false;
-      classifyBtn.textContent = "Classify Pet";
-    }
+    }, 1500);
   });
 
   tryAgainBtn.addEventListener("click", () => {
