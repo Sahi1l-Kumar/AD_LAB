@@ -11,6 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultText = document.querySelector(".result-text");
   const tryAgainBtn = document.querySelector(".try-again-btn");
 
+  let currentFile = null;
+
   ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
     dropZone.addEventListener(eventName, preventDefaults);
   });
@@ -44,7 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     } else {
-      // Use DataTransfer interface to access the file
       const files = e.dataTransfer.files;
       for (let i = 0; i < files.length; i++) {
         if (files[i].type.startsWith("image/")) {
@@ -77,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function handleFile(file) {
+    currentFile = file;
     const reader = new FileReader();
     reader.onload = (e) => {
       imagePreview.src = e.target.result;
@@ -86,13 +88,29 @@ document.addEventListener("DOMContentLoaded", () => {
     reader.readAsDataURL(file);
   }
 
-  classifyBtn.addEventListener("click", () => {
+  classifyBtn.addEventListener("click", async () => {
+    if (!currentFile) {
+      alert("Please select an image first");
+      return;
+    }
+
     classifyBtn.disabled = true;
     classifyBtn.textContent = "Analyzing...";
 
-    setTimeout(() => {
-      const pets = ["cat", "dog"];
-      const randomPet = pets[Math.floor(Math.random() * pets.length)];
+    try {
+      const formData = new FormData();
+      formData.append("image", currentFile);
+
+      const response = await fetch("http://localhost:5000/classify", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Classification failed");
+      }
+
+      const data = await response.json();
 
       uploadContainer.classList.add("hidden");
       previewContainer.classList.add("hidden");
@@ -100,15 +118,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
       setTimeout(() => {
         result.classList.add("visible");
-        petType.textContent = randomPet;
-        petIcon.className = `pet-icon ${randomPet}`;
+        const predictedPet = data.category.toLowerCase();
+        petType.textContent = data.category;
+        petIcon.className = `pet-icon ${predictedPet}`;
 
         setTimeout(() => {
           petIcon.classList.add("visible");
           resultText.classList.add("visible");
         }, 300);
       }, 100);
-    }, 1500);
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Failed to classify image. Please try again.");
+      classifyBtn.disabled = false;
+      classifyBtn.textContent = "Classify Pet";
+    }
   });
 
   tryAgainBtn.addEventListener("click", () => {
@@ -118,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
     result.classList.remove("visible");
     petIcon.className = "pet-icon";
     resultText.classList.remove("visible");
+    currentFile = null;
     setTimeout(() => {
       result.classList.add("hidden");
       classifyBtn.disabled = false;

@@ -3,8 +3,11 @@ from flask import Flask, request, jsonify, render_template
 from tensorflow.keras.models import load_model
 import numpy as np
 import cv2
+from flask_cors import CORS
 
 app = Flask(__name__, static_folder='styles', template_folder='../Lab2')
+
+CORS(app, origins=["https://pawdentity.netlify.app/"])
 
 MODEL_PATH = 'models/cat_dog_classifier.h5'
 UPLOAD_FOLDER = 'uploads'
