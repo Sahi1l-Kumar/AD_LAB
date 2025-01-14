@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const formData = new FormData();
       formData.append("image", currentFile);
 
-      const response = await fetch("http://localhost:5000/classify", {
+      const response = await fetch("https://pawdentity-latest.onrender.com", {
         method: "POST",
         body: formData,
       });
