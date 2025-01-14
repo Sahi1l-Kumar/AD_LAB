@@ -44,7 +44,7 @@ history = model.fit(
     epochs=20
 )
 
-model_save_path = './models/cat_dog_classifier.h5'
+model_save_path = os.path.join('.', 'models', 'cat_dog_classifier.h5')
 os.makedirs(os.path.dirname(model_save_path), exist_ok=True)  
 model.save(model_save_path)
 print(f"Model saved to {model_save_path}")
