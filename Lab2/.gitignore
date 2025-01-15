@@ -1,7 +1,7 @@
 # Ignore datasets folder
 datasets/
 
-models/cat_dog_classifier.h5
+models/
 
 # Ignore Python cache files
 __pycache__/

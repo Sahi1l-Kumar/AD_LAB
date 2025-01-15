@@ -194,6 +194,68 @@ h1:hover::after {
   transform: translateY(-5px) scale(1.1);
 }
 
+.model-selection {
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.model-selection::after {
+  content: "▼";
+  font-size: 0.8em;
+  color: var(--primary-color);
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.model-select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 2px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  background-color: white;
+  color: var(--text-color);
+  font-size: 1rem;
+  cursor: pointer;
+  appearance: none;
+  transition: all 0.3s ease;
+}
+
+.model-select:hover {
+  border-color: var(--primary-light);
+  box-shadow: 0 2px 8px rgba(139, 31, 31, 0.1);
+}
+
+.model-select:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(139, 31, 31, 0.1);
+}
+
+.model-info {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.4s ease 0.6s;
+}
+
+.model-info.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.model-name {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
 .preview-container {
   display: flex;
   flex-direction: column;

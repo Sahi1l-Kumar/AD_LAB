@@ -31,6 +31,15 @@
           </div>
           <div class="preview-container hidden">
             <img id="imagePreview" src="#" alt="Preview" />
+            <div class="model-selection">
+              <select id="modelSelect" class="model-select">
+                <option value="cnn" selected>CNN (Default)</option>
+                <option value="svm">SVM</option>
+                <option value="random_forest">Random Forest</option>
+                <option value="logistic_regression">Logistic Regression</option>
+                <option value="kmeans">K-means Clustering</option>
+              </select>
+            </div>
             <button class="classify-btn">Classify Pet</button>
           </div>
         </div>
@@ -41,6 +50,9 @@
             <div class="pet-icon"></div>
             <p class="result-text">
               Your pet is a <span class="pet-type">...</span>!
+            </p>
+            <p class="model-info">
+              Using <span class="model-name">CNN</span> model
             </p>
           </div>
           <button class="try-again-btn">Try Another Image</button>
