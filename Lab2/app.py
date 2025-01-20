@@ -24,9 +24,9 @@ kmeans_model = joblib.load(os.path.join(MODEL_FOLDER, 'kmeans_model.pkl'))
 def preprocess_image(image_path):
     img = cv2.imread(image_path)
     if img is not None:
-        img = cv2.resize(img, (128, 128)) 
-        img = img / 255.0 
-        img = np.expand_dims(img, axis=0) 
+        img = cv2.resize(img, (128, 128))  
+        img = img / 255.0  
+        img = np.expand_dims(img, axis=0)  
     return img
 
 def map_output(model_type, raw_output):
@@ -36,9 +36,9 @@ def map_output(model_type, raw_output):
     elif model_type == 'random_forest':
         return 'Dog' if raw_output == 0 else 'Cat'
     elif model_type == 'logistic_regression':
-        return 'Cat' if raw_output == 0 else 'Dog' 
+        return 'Cat' if raw_output == 0 else 'Dog'
     elif model_type == 'kmeans':
-        return f'Cluster {raw_output}'
+        return 'Cat' if raw_output == 0 else 'Dog'
     return 'Unknown'
 
 @app.route('/')
@@ -48,25 +48,22 @@ def index():
 @app.route('/classify', methods=['POST'])
 def classify_image():
     try:
-    
         if 'image' not in request.files:
             return jsonify({'error': 'No file uploaded'}), 400
 
         file = request.files['image']
-        model_type = request.form.get('model', 'cnn') 
+        model_type = request.form.get('model', 'cnn')  
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(file_path)
 
-    
         img = preprocess_image(file_path)
 
-    
         category = 'Unknown'
         if model_type == 'cnn':
             prediction = cnn_model.predict(img)[0][0]
             category = 'Dog' if prediction > 0.5 else 'Cat'
         elif model_type in ['svm', 'random_forest', 'logistic_regression', 'kmeans']:
-            img_flattened = img.flatten().reshape(1, -1) 
+            img_flattened = img.flatten().reshape(1, -1)  
             raw_output = None
             if model_type == 'svm':
                 raw_output = int(svm_model.predict(img_flattened)[0])

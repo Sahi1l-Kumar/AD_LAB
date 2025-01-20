@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const modelSelect = document.getElementById("modelSelect");
   const modelInfo = document.querySelector(".model-info");
   const modelName = document.querySelector(".model-name");
+  const removeImageBtn = document.querySelector(".remove-image-btn");
 
   let currentFile = null;
 
@@ -70,9 +71,26 @@ document.addEventListener("DOMContentLoaded", () => {
       imagePreview.src = e.target.result;
       dropZone.style.display = "none";
       previewContainer.classList.remove("hidden");
+      previewContainer.classList.remove("removing");
+      setTimeout(() => {
+        removeImageBtn.style.transform = "scale(1)";
+        removeImageBtn.style.opacity = "1";
+      }, 300);
     };
     reader.readAsDataURL(file);
   }
+
+  removeImageBtn.addEventListener("click", () => {
+    previewContainer.classList.add("removing");
+    setTimeout(() => {
+      previewContainer.classList.add("hidden");
+      dropZone.style.display = "block";
+      currentFile = null;
+      fileInput.value = "";
+      removeImageBtn.style.transform = "scale(0)";
+      removeImageBtn.style.opacity = "0";
+    }, 300);
+  });
 
   classifyBtn.addEventListener("click", async () => {
     if (!currentFile) {
@@ -135,6 +153,8 @@ document.addEventListener("DOMContentLoaded", () => {
     resultText.classList.remove("visible");
     modelInfo.classList.remove("visible");
     currentFile = null;
+    removeImageBtn.style.transform = "scale(0)";
+    removeImageBtn.style.opacity = "0";
     setTimeout(() => {
       result.classList.add("hidden");
       classifyBtn.disabled = false;

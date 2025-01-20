@@ -467,3 +467,64 @@ footer {
     gap: 1rem;
   }
 }
+
+.image-preview-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  border: 2px solid white;
+  color: white;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(139, 31, 31, 0.2);
+  transform: scale(0);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  opacity: 0;
+}
+
+.remove-image-btn svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+.remove-image-btn:hover {
+  background: var(--primary-light);
+  transform: scale(1.1) !important;
+}
+
+.remove-image-btn:hover svg {
+  transform: rotate(90deg);
+}
+
+.image-preview-wrapper:hover .remove-image-btn {
+  transform: scale(1);
+  opacity: 1;
+}
+
+@keyframes fadeOutZoom {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+.preview-container.removing {
+  animation: fadeOutZoom 0.3s ease forwards;
+}
