@@ -3,34 +3,10 @@ let chart = null;
 const stockData = {
   RELIANCE: { name: "Reliance Industries", basePrice: 2856.75 },
   TCS: { name: "Tata Consultancy Services", basePrice: 3945.2 },
-  AIRTEL: { name: "Bharti Airtel", basePrice: 876.25 },
+  HDFCBANK: { name: "HDFC Bank", basePrice: 1678.45 },
   INFY: { name: "Infosys", basePrice: 1456.3 },
+  TATAMOTORS: { name: "Tata Motors", basePrice: 876.25 },
 };
-
-async function getPrediction(stockSymbol, days, model) {
-  try {
-    const response = await fetch("http://localhost:5000/predict", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        days: days,
-        model: model,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error:", error);
-
-    return generateDummyData(days, stockSymbol, model);
-  }
-}
 
 function generateDummyData(days, stockSymbol, model) {
   const stock = stockData[stockSymbol.toUpperCase()] || { basePrice: 1000 };
@@ -250,10 +226,10 @@ document
     );
     const selectedModel = document.getElementById("modelSelect").value;
 
-    try {
-      const data = await getPrediction(
-        stockSymbol,
+    setTimeout(() => {
+      const data = generateDummyData(
         predictionDays,
+        stockSymbol,
         selectedModel
       );
       renderChart(data.historical_data, data.predictions, stockSymbol);
@@ -261,9 +237,6 @@ document
 
       document.getElementById("results").classList.remove("hidden");
       animateCards();
-    } catch (error) {
-      console.error("Error getting prediction:", error);
-    } finally {
       setLoading(false);
-    }
+    }, 1500);
   });
