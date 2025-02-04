@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles/styles.css" />
+    <title>AI Chatbot</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>AI Chatbot</h1>
+
+      <div class="file-upload">
+        <h2>Upload File</h2>
+        <input type="file" id="fileInput" accept=".txt,.pdf,.csv" />
+        <button onclick="uploadFile()">Upload</button>
+      </div>
+
+      <div class="chat-container">
+        <div class="model-selection">
+          <h3>Select AI Model</h3>
+          <select id="modelSelect">
+            <option value="gemini">Gemini</option>
+            <option value="groq">Groq</option>
+          </select>
+        </div>
+
+        <h3>Ask a Question</h3>
+        <textarea
+          id="questionInput"
+          placeholder="Type your question here..."
+        ></textarea>
+        <button onclick="askQuestion()">Send</button>
+
+        <div class="loading" id="loading">Processing...</div>
+
+        <div id="response"></div>
+      </div>
+    </div>
+
+    <script src="./styles/script.js"></script>
+  </body>
+</html>
