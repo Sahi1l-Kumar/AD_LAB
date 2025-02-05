@@ -14,7 +14,6 @@ app = Flask(__name__, static_folder='styles', template_folder='.')
 CORS(app)
 
 
-# Configure upload folder and allowed extensions
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'csv'}
 
@@ -23,7 +22,6 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Initialize AI models
 def init_gemini():
     gemini_api_key = os.getenv('GEMINI_API_KEY')
     if not gemini_api_key:
@@ -107,7 +105,7 @@ def chat():
         if model_choice == 'gemini':
             response = gemini_model.generate_content(prompt)
             answer = response.text
-        else:  # groq
+        else: 
             completion = groq_client.chat.completions.create(
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant that answers questions based on the provided context."},

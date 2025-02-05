@@ -14,20 +14,29 @@ function generateDummyData(days, stockSymbol, model) {
   const historicalData = [];
   const predictions = [];
 
+  // Generate more realistic historical data with smaller variations
+  let currentPrice = basePrice;
   for (let i = 0; i < 30; i++) {
-    historicalData.push(basePrice + (Math.random() - 0.5) * (basePrice * 0.05));
+    currentPrice += (Math.random() - 0.5) * (basePrice * 0.02); // Reduced variation
+    historicalData.push(parseFloat(currentPrice.toFixed(2)));
   }
 
+  // Generate predictions that follow the historical trend more closely
   const lastPrice = historicalData[historicalData.length - 1];
-  const trend = Math.random() > 0.5 ? 1 : -1;
+  const recentTrend =
+    historicalData[historicalData.length - 1] -
+    historicalData[historicalData.length - 5];
+  const trend = recentTrend > 0 ? 1 : -1;
+
+  let predictedPrice = lastPrice;
   for (let i = 0; i < days; i++) {
-    predictions.push(lastPrice + trend * (Math.random() * (basePrice * 0.03)));
+    // Use smaller variations and follow the recent trend
+    const variation = Math.random() * 0.015 * basePrice; // Reduced variation
+    predictedPrice += trend * variation;
+    predictions.push(parseFloat(predictedPrice.toFixed(2)));
   }
 
-  const predictedPrice =
-    model === "linear"
-      ? lastPrice + (Math.random() - 0.5) * (basePrice * 0.02)
-      : lastPrice + (Math.random() - 0.5) * (basePrice * 0.05);
+  const finalPredictedPrice = predictions[predictions.length - 1];
 
   return {
     historical_data: historicalData,
@@ -37,19 +46,13 @@ function generateDummyData(days, stockSymbol, model) {
       macd: ((Math.random() - 0.5) * 10).toFixed(2),
     },
     ai_metrics: {
-      accuracy:
-        model === "linear"
-          ? (Math.random() * 5 + 80).toFixed(2) + "%"
-          : (Math.random() * 5 + 85).toFixed(2) + "%",
-      confidence:
-        model === "linear"
-          ? (Math.random() * 5 + 80).toFixed(2) + "%"
-          : (Math.random() * 5 + 85).toFixed(2) + "%",
+      accuracy: (Math.random() * 5 + 85).toFixed(2) + "%",
+      confidence: (Math.random() * 5 + 85).toFixed(2) + "%",
     },
     trend_direction: trend,
     model_prediction: {
       days: parseInt(days),
-      predicted_price: parseFloat(predictedPrice.toFixed(2)),
+      predicted_price: parseFloat(finalPredictedPrice.toFixed(2)),
       symbol: stockSymbol.toUpperCase(),
       model: model,
     },
@@ -67,6 +70,10 @@ function renderChart(historicalData, predictions, stockSymbol) {
     ...Array(historicalData.length + predictions.length).keys(),
   ].map((i) => `Day ${i + 1}`);
 
+  // Create connected datasets by including the last historical point in predictions
+  const connectingPoint = historicalData[historicalData.length - 1];
+  const connectedPredictions = [connectingPoint, ...predictions];
+
   chart = new Chart(ctx, {
     type: "line",
     data: {
@@ -74,7 +81,7 @@ function renderChart(historicalData, predictions, stockSymbol) {
       datasets: [
         {
           label: "Historical Data",
-          data: [...historicalData, ...Array(predictions.length).fill(null)],
+          data: historicalData,
           borderColor: "#26A69A",
           backgroundColor: "rgba(38, 166, 154, 0.1)",
           borderWidth: 2,
@@ -83,7 +90,10 @@ function renderChart(historicalData, predictions, stockSymbol) {
         },
         {
           label: "Predictions",
-          data: [...Array(historicalData.length).fill(null), ...predictions],
+          data: [
+            ...Array(historicalData.length - 1).fill(null),
+            ...connectedPredictions,
+          ],
           borderColor: "#387ED1",
           backgroundColor: "rgba(56, 126, 209, 0.1)",
           borderWidth: 2,

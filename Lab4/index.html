@@ -7,19 +7,41 @@
     <title>AI Chatbot</title>
   </head>
   <body>
-    <div class="container">
-      <h1>AI Chatbot</h1>
+    <div class="container fade-in">
+      <h1 class="title">AI Chatbot</h1>
 
-      <div class="file-upload">
+      <div class="file-upload slide-in">
         <h2>Upload File</h2>
-        <input type="file" id="fileInput" accept=".txt,.pdf,.csv" />
-        <button onclick="uploadFile()">Upload</button>
+        <div class="upload-area" id="uploadArea">
+          <input type="file" id="fileInput" accept=".txt,.pdf,.csv" />
+          <div class="upload-icon">📄</div>
+          <p>Drag & drop or tap to upload</p>
+        </div>
+        <div id="preUploadPreview" class="pre-upload-preview">
+          <div class="file-info">
+            <div class="file-type-icon" id="fileTypeIcon"></div>
+            <div class="file-name" id="preUploadFileName"></div>
+          </div>
+          <button class="remove-preview" onclick="removePreUploadFile()">
+            ×
+          </button>
+        </div>
+        <div id="filePreview" class="file-preview">
+          <div class="file-preview-header">
+            <div class="file-preview-name" id="fileName"></div>
+            <button class="remove-file" onclick="removeFile()">
+              Remove File
+            </button>
+          </div>
+          <div class="file-preview-content" id="fileContent"></div>
+        </div>
+        <button onclick="uploadFile()" class="pulse">Upload</button>
       </div>
 
-      <div class="chat-container">
+      <div class="chat-container slide-in">
         <div class="model-selection">
           <h3>Select AI Model</h3>
-          <select id="modelSelect">
+          <select id="modelSelect" class="fancy-select">
             <option value="gemini">Gemini</option>
             <option value="groq">Groq</option>
           </select>
@@ -29,12 +51,23 @@
         <textarea
           id="questionInput"
           placeholder="Type your question here..."
+          class="fancy-input"
         ></textarea>
-        <button onclick="askQuestion()">Send</button>
+        <button onclick="askQuestion()" class="send-button">
+          <span>Send</span>
+          <div class="button-icon">→</div>
+        </button>
 
-        <div class="loading" id="loading">Processing...</div>
+        <div class="loading" id="loading">
+          <div class="loading-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          Processing...
+        </div>
 
-        <div id="response"></div>
+        <div id="response" class="response-area"></div>
       </div>
     </div>
 
