@@ -236,13 +236,147 @@ button:hover {
   padding: 20px;
   border-radius: 12px;
   min-height: 100px;
-  background-color: #f8f9fa;
+  background-color: #ffffff;
   border: 2px solid #e0e0e0;
   transition: all 0.3s ease;
+  line-height: 1.6;
+  font-size: 16px;
+  overflow-wrap: break-word;
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 .response-area:not(:empty) {
   animation: slideIn 0.3s ease-out;
+}
+
+.response-area h1,
+.response-area h2,
+.response-area h3,
+.response-area h4 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #2c3e50;
+}
+
+.response-area h1 {
+  font-size: 2em;
+  border-bottom: 2px solid #eaecef;
+  padding-bottom: 0.3em;
+}
+.response-area h2 {
+  font-size: 1.5em;
+  border-bottom: 1px solid #eaecef;
+  padding-bottom: 0.3em;
+}
+.response-area h3 {
+  font-size: 1.25em;
+}
+.response-area h4 {
+  font-size: 1em;
+}
+
+.response-area p {
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.response-area ul,
+.response-area ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+
+.response-area li {
+  margin-bottom: 8px;
+}
+
+.response-area code {
+  background-color: #f6f8fa;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  font-size: 0.9em;
+  color: #476582;
+}
+
+.response-area pre {
+  background-color: #f6f8fa;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 16px 0;
+  border: 1px solid #e0e0e0;
+}
+
+.response-area pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  color: #476582;
+  display: block;
+  line-height: 1.5;
+}
+
+.response-area blockquote {
+  border-left: 4px solid #007bff;
+  padding: 12px 16px;
+  margin: 16px 0;
+  background-color: #f8f9fa;
+  color: #2c3e50;
+  font-style: italic;
+}
+
+.response-area strong {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.response-area em {
+  font-style: italic;
+}
+
+.response-area table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16px 0;
+}
+
+.response-area th,
+.response-area td {
+  border: 1px solid #e0e0e0;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.response-area th {
+  background-color: #f6f8fa;
+  font-weight: 600;
+}
+
+.response-area tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.response-area::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.response-area::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.response-area::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 4px;
+}
+
+.response-area::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
 }
 
 .notification {

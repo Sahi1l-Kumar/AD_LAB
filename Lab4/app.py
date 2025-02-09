@@ -115,7 +115,19 @@ def chat():
     context = data['context']
     model_choice = data['model']
     
-    prompt = f"""Context: {context}\n\nQuestion: {question}\n\nPlease answer the question based on the context provided."""
+    prompt = f"""Context: {context}
+
+Question: {question}
+
+Please provide a clear, well-structured response following these guidelines:
+- Use markdown formatting for better readability
+- Break down your answer into relevant sections
+- Use bullet points or numbered lists where appropriate
+- Add headings using markdown (e.g., ### Section Title) for different parts of your answer
+- Format any code snippets using markdown code blocks
+- Use bold or italic text to emphasize important points
+
+Answer:"""
     
     try:
         if model_choice == 'gemini':
@@ -126,7 +138,7 @@ def chat():
         else: 
             completion = groq_client.chat.completions.create(
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant that answers questions based on the provided context."},
+                    {"role": "system", "content": "You are a helpful assistant that provides well-structured, markdown-formatted responses with clear sections, headings, and formatting."},
                     {"role": "user", "content": prompt}
                 ],
                 model="mixtral-8x7b-32768",

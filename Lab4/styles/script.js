@@ -138,6 +138,22 @@ async function uploadFile() {
   }
 }
 
+function renderMarkdown(text) {
+  text = text
+    .replace(/### (.*$)/gim, "<h3>$1</h3>")
+    .replace(/## (.*$)/gim, "<h2>$1</h2>")
+    .replace(/# (.*$)/gim, "<h1>$1</h1>")
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+    .replace(/```([\s\S]*?)```/g, "<pre><code>$1</code></pre>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/^\s*-\s(.+)/gim, "<li>$1</li>")
+    .replace(/(<li>.*<\/li>)/gims, "<ul>$1</ul>")
+    .replace(/\n/g, "<br>");
+
+  return text;
+}
+
 async function askQuestion() {
   if (!fileContent) {
     showNotification("Please upload a file first", "error");
@@ -174,7 +190,7 @@ async function askQuestion() {
 
     const data = await response.json();
     if (data.response) {
-      responseDiv.innerHTML = data.response;
+      responseDiv.innerHTML = renderMarkdown(data.response);
     } else {
       responseDiv.innerHTML = "Error: " + data.error;
     }
