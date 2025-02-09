@@ -7,15 +7,16 @@ import google.generativeai as genai
 from groq import Groq
 from flask_cors import CORS
 from dotenv import load_dotenv
+import requests
 
 load_dotenv('.env.local')
 
 app = Flask(__name__, static_folder='styles', template_folder='.')
 CORS(app)
 
-
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'csv'}
+OLLAMA_API_URL = "http://localhost:11434/api/generate"
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -63,6 +64,21 @@ def extract_text(file_path):
         df = pd.read_csv(file_path)
         return df.to_string()
 
+def get_ollama_response(prompt):
+    payload = {
+        "model": "deepseek-r1:1.5b",
+        "prompt": prompt,
+        "stream": False
+    }
+    try:
+        response = requests.post(OLLAMA_API_URL, json=payload)
+        response.raise_for_status()
+        return response.json()["response"]
+    except requests.exceptions.ConnectionError:
+        raise Exception("Could not connect to Ollama. Make sure it's running (ollama run deepseek-r1:1.5b)")
+    except Exception as e:
+        raise Exception(f"Ollama API error: {str(e)}")
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -105,6 +121,8 @@ def chat():
         if model_choice == 'gemini':
             response = gemini_model.generate_content(prompt)
             answer = response.text
+        elif model_choice == 'ollama':
+            answer = get_ollama_response(prompt)
         else: 
             completion = groq_client.chat.completions.create(
                 messages=[
