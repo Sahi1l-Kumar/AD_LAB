@@ -9,6 +9,41 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+function parseMarkdown(text) {
+  // Handle code blocks
+  text = text.replace(/```([^`]+)```/g, "<pre><code>$1</code></pre>");
+
+  // Handle inline code
+  text = text.replace(/`([^`]+)`/g, "<code>$1</code>");
+
+  // Handle headers
+  text = text.replace(/^### (.*$)/gm, "<h3>$1</h3>");
+  text = text.replace(/^## (.*$)/gm, "<h2>$1</h2>");
+  text = text.replace(/^# (.*$)/gm, "<h1>$1</h1>");
+
+  // Handle bold
+  text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+  // Handle italic
+  text = text.replace(/\*(.*?)\*/g, "<em>$1</em>");
+
+  // Handle links
+  text = text.replace(
+    /\[([^\]]+)\]\(([^)]+)\)/g,
+    '<a href="$2" target="_blank">$1</a>'
+  );
+
+  // Handle lists
+  text = text.replace(/^\s*-\s(.+)/gm, "<li>$1</li>");
+  text = text.replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>");
+
+  // Handle paragraphs
+  text = text.replace(/\n\n/g, "</p><p>");
+  text = "<p>" + text + "</p>";
+
+  return text;
+}
+
 async function scrapeWebsite() {
   const urlInput = document.getElementById("urlInput");
   const loading = document.getElementById("loading");
@@ -45,15 +80,19 @@ async function scrapeWebsite() {
     const data = await response.json();
 
     if (response.ok) {
-      // Update UI with results
+      // Update UI with results and parse markdown
       summary.innerHTML = `
                 <h2 style="margin-bottom: 1rem; color: var(--text)">LLM Summary</h2>
-                <pre style="white-space: pre-wrap; font-family: inherit;">${data.summary}</pre>
+                <div class="markdown-content">${parseMarkdown(
+                  data.summary
+                )}</div>
             `;
 
       scrapedContent.innerHTML = `
                 <h2 style="margin-bottom: 1rem; color: var(--text)">Scraped Content Preview</h2>
-                <p>${data.scraped_content}</p>
+                <div class="markdown-content">${parseMarkdown(
+                  data.scraped_content
+                )}</div>
             `;
 
       // Show results with animation
