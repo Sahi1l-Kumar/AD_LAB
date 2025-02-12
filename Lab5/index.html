@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Intelligent Web Scraper</title>
+    <link rel="stylesheet" href="styles/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Intelligent Web Scraper</h1>
+        <p class="subtitle">Powered by LLM Analysis</p>
+      </div>
+
+      <div class="search-container">
+        <div class="input-wrapper">
+          <input
+            type="text"
+            id="urlInput"
+            placeholder="Enter any website URL to analyze..."
+            autocomplete="off"
+          />
+          <button onclick="scrapeWebsite()" class="analyze-btn">
+            <span class="btn-text">Analyze</span>
+            <span class="btn-icon">→</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="loading" id="loading">
+        <div class="loader"></div>
+        <p>Analyzing website content...</p>
+      </div>
+
+      <div class="error" id="error"></div>
+
+      <div class="results" id="results">
+        <div class="summary-container" id="summary"></div>
+        <div class="content-container" id="scraped-content"></div>
+      </div>
+    </div>
+    <script src="styles/script.js"></script>
+  </body>
+</html>
