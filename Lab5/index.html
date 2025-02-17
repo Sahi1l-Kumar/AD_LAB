@@ -7,26 +7,48 @@
     <link rel="stylesheet" href="styles/styles.css" />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     />
   </head>
   <body>
     <div class="container">
       <div class="header">
         <h1>Intelligent Web Scraper</h1>
-        <p class="subtitle">Powered by LLM Analysis</p>
+        <p class="subtitle">
+          Extract insights from any webpage with AI-powered analysis
+        </p>
       </div>
 
       <div class="search-container">
         <div class="input-wrapper">
-          <input
-            type="text"
-            id="urlInput"
-            placeholder="Enter any website URL to analyze..."
-            autocomplete="off"
-          />
+          <div class="input-group">
+            <label for="urlInput" class="input-label">Website URL</label>
+            <input
+              type="text"
+              id="urlInput"
+              placeholder="Enter any website URL to analyze..."
+              autocomplete="off"
+            />
+          </div>
+          <div class="input-group">
+            <label for="topicInput" class="input-label">Topic (Optional)</label>
+            <input
+              type="text"
+              id="topicInput"
+              placeholder="Enter a specific topic to focus the analysis"
+              autocomplete="off"
+            />
+          </div>
+          <div class="input-group">
+            <label for="modelSelect" class="input-label">AI Model</label>
+            <select id="modelSelect" class="model-select">
+              <option value="deepseek">Deepseek (Local)</option>
+              <option value="gemini">Gemini</option>
+              <option value="groq">Groq</option>
+            </select>
+          </div>
           <button onclick="scrapeWebsite()" class="analyze-btn">
-            <span class="btn-text">Analyze</span>
+            <span class="btn-text">Analyze Website</span>
             <span class="btn-icon">→</span>
           </button>
         </div>
@@ -41,7 +63,6 @@
 
       <div class="results" id="results">
         <div class="summary-container" id="summary"></div>
-        <div class="content-container" id="scraped-content"></div>
       </div>
     </div>
     <script src="styles/script.js"></script>
