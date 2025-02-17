@@ -51,10 +51,49 @@ h1 {
   font-size: 2.75rem;
   font-weight: 800;
   margin-bottom: 0.75rem;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  letter-spacing: -0.025em;
+  color: var(--text);
+}
+
+.title-gradient {
+  background-size: 200% auto;
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  letter-spacing: -0.025em;
+  animation: rgbText 8s linear infinite;
+}
+
+@keyframes rgbText {
+  0% {
+    background-image: linear-gradient(
+      92deg,
+      rgba(59, 130, 246, 0.9),
+      rgba(16, 185, 129, 0.7),
+      rgba(99, 102, 241, 0.9),
+      rgba(59, 130, 246, 0.9)
+    );
+    background-position: 0% center;
+  }
+  50% {
+    background-image: linear-gradient(
+      92deg,
+      rgba(59, 130, 246, 0.9),
+      rgba(16, 185, 129, 0.7),
+      rgba(99, 102, 241, 0.9),
+      rgba(59, 130, 246, 0.9)
+    );
+    background-position: 100% center;
+  }
+  100% {
+    background-image: linear-gradient(
+      92deg,
+      rgba(59, 130, 246, 0.9),
+      rgba(16, 185, 129, 0.7),
+      rgba(99, 102, 241, 0.9),
+      rgba(59, 130, 246, 0.9)
+    );
+    background-position: 0% center;
+  }
 }
 
 .subtitle {
@@ -168,16 +207,12 @@ h1 {
   justify-content: center;
   gap: 1rem;
   margin: 2rem 0;
-  padding: 1.5rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: var(--card-shadow);
 }
 
 .loader {
   width: 24px;
   height: 24px;
-  border: 3px solid var(--primary-light);
+  border: 3px solid #ddd;
   border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
