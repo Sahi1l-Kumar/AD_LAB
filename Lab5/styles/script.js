@@ -59,10 +59,6 @@ async function scrapeWebsite() {
   summary.innerHTML = "";
 
   const url = urlInput.value.trim();
-  if (!url) {
-    showError("Please enter a valid URL");
-    return;
-  }
 
   const topic = topicInput.value.trim();
   const model = modelSelect.value;

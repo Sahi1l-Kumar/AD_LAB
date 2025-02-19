@@ -80,26 +80,51 @@ def duckduckgo_search(query):
         
         soup = BeautifulSoup(response.text, 'html.parser')
         
-        results = soup.select('.result__title .result__a')
+        results = soup.select('.results_links_deep:not(.results-sponsored)')
         
         valid_links = []
-        for link in results:
-            href = link.get('href', '')
-            if href:
+        for result in results:
+            link = result.select_one('.result__title .result__a')
+            snippet = result.select_one('.result__snippet')
+            
+            if link and snippet:
+                href = link.get('href', '')
+                title = link.get_text()
+                snippet_text = snippet.get_text()
+                
+                if any(ad_indicator in href.lower() for ad_indicator in [
+                    'ad_provider', 'sponsored', 'advertisement', 'pdffiller', 
+                    'click_metadata', 'utm_source=bing'
+                ]):
+                    continue
+                
                 if href.startswith('http'):
-                    valid_links.append(href)
+                    url = href
                 elif href.startswith('/'):
                     try:
-                        actual_url = requests.utils.unquote(href.split('?uddg=')[1].split('&')[0])
-                        valid_links.append(actual_url)
+                        url = requests.utils.unquote(href.split('?uddg=')[1].split('&')[0])
                     except:
                         continue
-                print(f"Found DuckDuckGo result: {valid_links[-1] if valid_links else 'None'}")
+                else:
+                    continue
+                
+                valid_links.append({
+                    'url': url,
+                    'title': title,
+                    'snippet': snippet_text
+                })
+                print(f"Found DuckDuckGo result: {url}")
+                
                 if len(valid_links) >= 5:
                     break
         
         if valid_links:
-            return valid_links[0]
+            news_domains = ['news', 'times', 'bbc', 'cnn', 'reuters', 'theweek', 'firstpost', 'ndtv', 'msn']
+            for link in valid_links:
+                if any(domain in link['url'].lower() for domain in news_domains):
+                    return link['url']
+            
+            return valid_links[0]['url']
         
         print("No valid links found in DuckDuckGo search results.")
         return None
@@ -226,7 +251,17 @@ def scrape():
     model = data.get('model', 'deepseek')
     
     if not url:
-        return jsonify({'error': 'URL is required'}), 400
+        if not topic:
+            return jsonify({'error': 'Either a URL or a topic must be provided'}), 400
+
+        print(f"No URL provided, searching DuckDuckGo for: {topic}")
+        url = duckduckgo_search(topic)
+
+        if not url:
+            return jsonify({'error': 'No relevant webpage found for the topic'}), 404
+
+        print(f"Using found URL: {url}")
+
     
     if not validators.url(url):
         return jsonify({'error': 'Invalid URL'}), 400
