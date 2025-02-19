@@ -81,9 +81,13 @@ async function scrapeWebsite() {
     const data = await response.json();
 
     if (response.ok) {
-      const headerText = topic
-        ? `Analysis of "${topic}" from the webpage using ${model}`
+      let headerText = topic
+        ? `Analysis of "${topic}" using ${model}`
         : `Website Analysis using ${model}`;
+
+      if (data.fallback_url) {
+        headerText = `Analysis of "${topic}" from Google Search Result using ${model}`;
+      }
 
       summary.innerHTML = `
                 <h2 style="margin-bottom: 1.5rem; color: var(--text); font-size: 1.5rem; font-weight: 700;">${headerText}</h2>

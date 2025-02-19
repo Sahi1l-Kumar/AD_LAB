@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 import os
 import google.generativeai as genai
 from groq import Groq
+import re
+from urllib.parse import quote_plus
 
 load_dotenv('.env.local')
 
@@ -65,6 +67,47 @@ def scrape_webpage(url):
     except Exception as e:
         return f"Error scraping webpage: {str(e)}"
 
+def duckduckgo_search(query):
+    try:
+        search_url = f"https://html.duckduckgo.com/html/?q={quote_plus(query)}"
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        }
+        response = requests.get(search_url, headers=headers, timeout=10)
+        response.raise_for_status()
+        
+        print(f"DuckDuckGo search status code: {response.status_code}")
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        results = soup.select('.result__title .result__a')
+        
+        valid_links = []
+        for link in results:
+            href = link.get('href', '')
+            if href:
+                if href.startswith('http'):
+                    valid_links.append(href)
+                elif href.startswith('/'):
+                    try:
+                        actual_url = requests.utils.unquote(href.split('?uddg=')[1].split('&')[0])
+                        valid_links.append(actual_url)
+                    except:
+                        continue
+                print(f"Found DuckDuckGo result: {valid_links[-1] if valid_links else 'None'}")
+                if len(valid_links) >= 5:
+                    break
+        
+        if valid_links:
+            return valid_links[0]
+        
+        print("No valid links found in DuckDuckGo search results.")
+        return None
+        
+    except Exception as e:
+        print(f"Error during DuckDuckGo search: {str(e)}")
+        return None
+
 def create_prompt(text, topic=None):
     if topic:
         prompt = f"""TASK: Extract and summarize ONLY information about '{topic}' from the provided text.
@@ -123,16 +166,35 @@ def create_prompt(text, topic=None):
     
     return prompt
 
+def check_if_topic_not_found(result, topic):
+    if not topic:
+        return False
+    
+    if re.search(rf"(?:topic|'{topic}'|the topic '{topic}')\s+(?:was|is)\s+not\s+found", result, re.IGNORECASE):
+        return True
+    
+    if "therefore, i should respond accordingly without mentioning other topics." in result.lower():
+        return True
+    
+    if re.search(rf"no\s+information\s+(?:about|on|regarding)\s+(?:the topic\s+)?['\"]?{topic}['\"]?", result, re.IGNORECASE):
+        return True
+    
+    if not (re.search(r"## Overview", result, re.IGNORECASE) and re.search(r"## Key Points", result, re.IGNORECASE)):
+        if re.search(rf"(?:couldn't|could not|didn't|did not|no|none)\s+find", result, re.IGNORECASE):
+            return True
+    
+    return False
+
 def process_with_llm(text, topic=None, model="deepseek"):
     prompt = create_prompt(text, topic)
     
     try:
         if model == "deepseek":
-            return get_ollama_response(prompt)
+            result = get_ollama_response(prompt)
         
         elif model == "gemini":
             response = gemini_model.generate_content(prompt)
-            return response.text
+            result = response.text
         
         elif model == "groq":
             completion = groq_client.chat.completions.create(
@@ -142,10 +204,12 @@ def process_with_llm(text, topic=None, model="deepseek"):
                 ],
                 model="llama3-8b-8192",
             )
-            return completion.choices[0].message.content
+            result = completion.choices[0].message.content
         
         else:
             raise ValueError(f"Unsupported model: {model}")
+        
+        return result
             
     except Exception as e:
         raise Exception(f"Error processing with {model}: {str(e)}")
@@ -170,13 +234,40 @@ def scrape():
     scraped_content = scrape_webpage(url)
     
     try:
+        print(f"Processing URL: {url} for topic: {topic} using model: {model}")
         summary = process_with_llm(scraped_content, topic, model)
+        print(f"Initial summary result: {summary[:200]}...")
+        
+        if topic and check_if_topic_not_found(summary, topic):
+            print(f"Topic '{topic}' not found, attempting DuckDuckGo search...")
+            search_query = f"{topic} information"
+            new_url = duckduckgo_search(search_query)
+            print(f"DuckDuckGo search returned URL: {new_url}")
+            
+            if new_url:
+                print(f"Scraping new URL: {new_url}")
+                new_content = scrape_webpage(new_url)
+                new_summary = process_with_llm(new_content, topic, model)
+                print(f"New summary result: {new_summary[:200]}...")
+                
+                if not check_if_topic_not_found(new_summary, topic):
+                    print(f"Topic found in new URL. Returning combined summary.")
+                    search_info = f"*Original website didn't contain information about '{topic}'. This summary is from: {new_url}*\n\n"
+                    return jsonify({
+                        'summary': search_info + new_summary,
+                        'fallback_url': new_url
+                    })
+                else:
+                    print(f"Topic not found in new URL either. Returning original summary.")
+        
         return jsonify({
             'summary': summary
         })
     except ValueError as e:
+        print(f"ValueError: {str(e)}")
         return jsonify({'error': str(e)}), 400
     except Exception as e:
+        print(f"Exception: {str(e)}")
         return jsonify({'error': f'Error processing with LLM: {str(e)}'}), 500
 
 if __name__ == '__main__':
