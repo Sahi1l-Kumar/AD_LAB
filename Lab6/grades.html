@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Grades - Grading System</title>
+    <link rel="stylesheet" href="styles/styles.css" />
+    <link rel="stylesheet" href="styles/dashboard.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-content">
+        <h1>Student Dashboard</h1>
+        <button class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="nav-links">
+          <a href="grades.html" class="active">Grades</a>
+          <a href="profile.html">Profile</a>
+          <a href="index.html">Logout</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="dashboard-container">
+      <div class="grades-card">
+        <h2>Current Semester Grades</h2>
+        <div class="semester-info">
+          <p>Semester: Fall 2024</p>
+          <p>GPA: 3.75</p>
+        </div>
+        <div class="grades-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Course Code</th>
+                <th>Course Name</th>
+                <th>Credits</th>
+                <th>Grade</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>CS101</td>
+                <td>Introduction to Programming</td>
+                <td>3</td>
+                <td>A</td>
+                <td><span class="status completed">Completed</span></td>
+              </tr>
+              <tr>
+                <td>MATH201</td>
+                <td>Advanced Calculus</td>
+                <td>4</td>
+                <td>A-</td>
+                <td><span class="status completed">Completed</span></td>
+              </tr>
+              <tr>
+                <td>PHY102</td>
+                <td>Physics II</td>
+                <td>4</td>
+                <td>B+</td>
+                <td><span class="status in-progress">In Progress</span></td>
+              </tr>
+              <tr>
+                <td>ENG201</td>
+                <td>Technical Writing</td>
+                <td>3</td>
+                <td>A</td>
+                <td><span class="status completed">Completed</span></td>
+              </tr>
+              <tr>
+                <td>CHEM101</td>
+                <td>General Chemistry</td>
+                <td>4</td>
+                <td>B</td>
+                <td><span class="status in-progress">In Progress</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <script src="styles/navbar.js"></script>
+  </body>
+</html>

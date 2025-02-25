@@ -1,0 +1,317 @@
+/* Navbar Styles */
+.navbar {
+  background: #1a1a1a;
+  padding: 1rem 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.nav-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-content h1 {
+  color: white;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.nav-links a:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-links a.active {
+  background: #2563eb;
+}
+
+/* Hamburger Menu */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+}
+
+.hamburger span {
+  width: 2rem;
+  height: 0.25rem;
+  background: white;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+  max-width: 1400px;
+  margin: 6rem auto 2rem;
+  padding: 0 1rem;
+}
+
+/* Profile Card */
+.profile-card {
+  background: white;
+  padding: 3rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.profile-card form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+
+.profile-card .input-group:first-child {
+  grid-column: 1 / -1;
+}
+
+.profile-picture {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 1rem 0;
+  border: 4px solid #f3f4f6;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile-picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Form Labels */
+label {
+  display: block;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* Form Inputs */
+.profile-card input {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  color: #1f2937;
+  font-size: 0.95rem;
+  padding: 0.625rem 0.875rem;
+  height: 2.75rem;
+}
+
+.profile-card input:focus {
+  border-color: #2563eb;
+  background: white;
+}
+
+.profile-card .submit-btn {
+  grid-column: 1 / -1;
+  max-width: 200px;
+  justify-self: end;
+  margin-top: 1rem;
+}
+
+/* Grades Card */
+.grades-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  overflow: hidden;
+}
+
+.semester-info {
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem 0 2rem;
+  color: #1f2937;
+  font-size: 1.1rem;
+}
+
+/* Grades Table */
+.grades-table {
+  overflow-x: auto;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #374151;
+  min-width: 800px;
+}
+
+th,
+td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #1f2937;
+  white-space: nowrap;
+}
+
+tr:hover {
+  background: #f9fafb;
+}
+
+/* Status Badges */
+.status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status.completed {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status.in-progress {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+/* Page Background */
+body {
+  background: #f3f4f6;
+  min-height: 100vh;
+}
+
+/* Headings */
+h2 {
+  color: #1f2937;
+  margin-bottom: 2rem;
+  font-size: 1.875rem;
+  text-align: left;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .nav-content {
+    padding: 0 1rem;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #1a1a1a;
+    padding: 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .nav-links.active {
+    display: flex;
+  }
+
+  .nav-links a {
+    width: 100%;
+    text-align: center;
+    padding: 0.75rem;
+  }
+
+  .profile-card form {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .profile-card .submit-btn {
+    max-width: 100%;
+  }
+
+  .semester-info {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .profile-card {
+    padding: 1.5rem;
+  }
+
+  /* Hamburger Animation */
+  .hamburger.active span:nth-child(1) {
+    transform: translateY(0.75rem) rotate(45deg);
+  }
+
+  .hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger.active span:nth-child(3) {
+    transform: translateY(-0.75rem) rotate(-45deg);
+  }
+}
+
+@media (max-width: 400px) {
+  .dashboard-container {
+    padding: 0 0.75rem;
+  }
+
+  .grades-card {
+    padding: 1rem;
+  }
+
+  th,
+  td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .status {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}
