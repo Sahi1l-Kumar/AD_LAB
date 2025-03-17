@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Function to handle form submission
-  const handleFormSubmit = async (form, endpoint, data) => {
+  const handleFormSubmit = async (endpoint, data) => {
     try {
       const response = await fetch(endpoint, {
         method: "POST",
@@ -41,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (result.redirect) {
           window.location.href = result.redirect;
         } else {
-          // Display success message if there's no redirect
           alert(result.message || "Operation successful!");
         }
       } else {
@@ -58,22 +57,18 @@ document.addEventListener("DOMContentLoaded", () => {
     signupForm.addEventListener("submit", (e) => {
       e.preventDefault();
 
-      const username = signupForm.querySelector('input[type="text"]').value;
-      const fullname = signupForm.querySelector('input[type="text"]').value;
-      const email = signupForm.querySelector('input[type="email"]').value;
-      const password = signupForm.querySelector('input[type="password"]').value;
+      const inputs = signupForm.querySelectorAll('input');
+      const username = inputs[0].value.trim();
+      const fullname = inputs[1].value.trim();
+      const email = inputs[2].value.trim();
+      const password = inputs[3].value.trim();
 
       if (!username || !fullname || !email || !password) {
         alert("Please fill in all fields");
         return;
       }
 
-      handleFormSubmit(signupForm, "/signup", {
-        username: username,
-        fullname: fullname,
-        email: email,
-        password: password,
-      });
+      handleFormSubmit("/signup", { username, fullname, email, password });
     });
   }
 
@@ -82,57 +77,77 @@ document.addEventListener("DOMContentLoaded", () => {
     signinForm.addEventListener("submit", (e) => {
       e.preventDefault();
 
-      const username = signinForm.querySelector('input[type="text"]').value;
-      const password = signinForm.querySelector('input[type="password"]').value;
+      const username = signinForm.querySelector('input[type="text"]').value.trim();
+      const password = signinForm.querySelector('input[type="password"]').value.trim();
 
       if (!username || !password) {
         alert("Please fill in all fields");
         return;
       }
 
-      handleFormSubmit(signinForm, "/login", {
-        username: username,
-        password: password,
-      });
+      handleFormSubmit("/login", { username, password });
     });
   }
 
-  // Profile form submission
+  // Fetch user profile details
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch("/profile");
+      const data = await response.json();
+
+      if (data.username) {
+        document.getElementById("username").value = data.username;
+        document.getElementById("fullname").value = data.fullname;
+        document.getElementById("email").value = data.email;
+      }
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    }
+  };
+
+  fetchProfile();
+
+  // Handle profile update
   if (profileForm) {
-    profileForm.addEventListener("submit", (e) => {
+    profileForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const email = profileForm.querySelector('input[type="email"]').value;
-      const full_name = profileForm.querySelector(
-        'input[value="John Doe"]'
-      ).value;
+      const fullname = document.getElementById("fullname").value.trim();
+      const email = document.getElementById("email").value.trim();
 
-      handleFormSubmit(profileForm, "/profile", {
-        email: email,
-        full_name: full_name,
-      });
+      try {
+        const response = await fetch("/profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fullname, email }),
+        });
+
+        const result = await response.json();
+        alert(result.message);
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        alert("Failed to update profile.");
+      }
     });
+  }
+  
+  // Password reset functionality (separate event listener)
+  const resetPasswordForm = document.getElementById("resetPasswordForm");
 
-    // Password reset functionality
-    const currentPassword = profileForm.querySelector(
-      'input[placeholder="Enter current password"]'
-    );
-    const newPassword = profileForm.querySelector(
-      'input[placeholder="Enter new password"]'
-    );
+  if (resetPasswordForm) {
+    resetPasswordForm.addEventListener("submit", (e) => {
+      e.preventDefault();
 
-    if (currentPassword && newPassword) {
-      profileForm.addEventListener("submit", (e) => {
-        e.preventDefault();
+      const currentPassword = resetPasswordForm.querySelector('input[name="current_password"]').value.trim();
+      const newPassword = resetPasswordForm.querySelector('input[name="new_password"]').value.trim();
 
-        if (currentPassword.value && newPassword.value) {
-          handleFormSubmit(profileForm, "/reset_password", {
-            current_password: currentPassword.value,
-            new_password: newPassword.value,
-          });
-        }
-      });
-    }
+      if (!currentPassword || !newPassword) {
+        alert("Please fill in both fields.");
+        return;
+      }
+
+      handleFormSubmit("/reset_password", { current_password: currentPassword, new_password: newPassword });
+    });
   }
 
   // Navbar toggle for mobile view

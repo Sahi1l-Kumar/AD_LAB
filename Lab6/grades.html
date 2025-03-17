@@ -17,9 +17,9 @@
           <span></span>
         </button>
         <div class="nav-links">
-          <a href="grades.html" class="active">Grades</a>
-          <a href="profile.html">Profile</a>
-          <a href="index.html">Logout</a>
+          <a href="/grades" class="active">Grades</a>
+          <a href="/profile">Profile</a>
+          <a href="/">Logout</a>
         </div>
       </div>
     </nav>
@@ -27,10 +27,6 @@
     <div class="dashboard-container">
       <div class="grades-card">
         <h2>Current Semester Grades</h2>
-        <div class="semester-info">
-          <p>Semester: Fall 2024</p>
-          <p>GPA: 3.75</p>
-        </div>
         <div class="grades-table">
           <table>
             <thead>
@@ -39,43 +35,52 @@
                 <th>Course Name</th>
                 <th>Grade</th>
                 <th>Marks</th>
-                <th>Status</th>
+                <th>Semester</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="gradesTableBody">
               <tr>
-                <td>CS301</td>
-                <td>Database Management Systems</td>
-                <td>A</td>
-                <td>92.5</td>
-                <td><span class="status completed">Completed</span></td>
-              </tr>
-              <tr>
-                <td>CS302</td>
-                <td>Web Development</td>
-                <td>B</td>
-                <td>85.0</td>
-                <td><span class="status completed">Completed</span></td>
-              </tr>
-              <tr>
-                <td>CS303</td>
-                <td>Computer Networks</td>
-                <td>A</td>
-                <td>90.0</td>
-                <td><span class="status in-progress">In Progress</span></td>
-              </tr>
-              <tr>
-                <td>CS201</td>
-                <td>Data Structures and Algorithms</td>
-                <td>B</td>
-                <td>86.5</td>
-                <td><span class="status in-progress">In Progress</span></td>
+                <td colspan="5">Loading...</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
-    <script src="styles/navbar.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        fetch("/grades", { headers: { "X-Requested-With": "XMLHttpRequest" } })
+          .then((response) => response.json())
+          .then((data) => {
+            const tableBody = document.getElementById("gradesTableBody");
+            tableBody.innerHTML = "";
+
+            if (data.length === 0) {
+              tableBody.innerHTML = `<tr><td colspan="5">No grades available</td></tr>`;
+              return;
+            }
+
+            data.forEach((grade) => {
+              const row = `
+                            <tr>
+                                <td>${grade.course_code}</td>
+                                <td>${grade.course_name}</td>
+                                <td>${grade.grade}</td>
+                                <td>${grade.marks}</td>
+                                <td>${grade.semester}</td>
+                            </tr>
+                        `;
+              tableBody.innerHTML += row;
+            });
+          })
+          .catch((error) => {
+            console.error("Error fetching grades:", error);
+            document.getElementById(
+              "gradesTableBody"
+            ).innerHTML = `<tr><td colspan="5">Error loading grades</td></tr>`;
+          });
+      });
+    </script>
   </body>
 </html>
