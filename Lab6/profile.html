@@ -39,36 +39,27 @@
           </div>
           <div class="input-group">
             <label>Username</label>
-            <input type="text" name="username" value="john_doe" readonly />
+            <input type="text" id="username" name="username" readonly />
           </div>
           <div class="input-group">
             <label>Full Name</label>
-            <input type="text" name="fullname" value="John Doe" required />
+            <input type="text" id="fullname" name="fullname" required />
           </div>
           <div class="input-group">
             <label>Email</label>
-            <input
-              type="email"
-              name="email"
-              value="john.doe@example.com"
-              required
-            />
+            <input type="email" id="email" name="email" required />
           </div>
           <div class="input-group">
             <label>Phone</label>
-            <input type="tel" name="phone" value="555-123-4567" />
+            <input type="tel" id="phone" name="phone" />
           </div>
           <div class="input-group">
             <label>Address</label>
-            <textarea name="address" rows="3">
-123 Main St, Anytown, CA 94001</textarea
-            >
+            <textarea id="address" name="address" rows="3"></textarea>
           </div>
           <div class="input-group">
             <label>Bio</label>
-            <textarea name="bio" rows="4">
-Computer Science student with interest in AI and machine learning.</textarea
-            >
+            <textarea id="bio" name="bio" rows="4"></textarea>
           </div>
           <div class="input-group">
             <label>Current Password</label>
@@ -90,6 +81,126 @@ Computer Science student with interest in AI and machine learning.</textarea
         </form>
       </div>
     </div>
+
     <script src="styles/navbar.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        async function fetchProfile() {
+          try {
+            const response = await fetch(`/profile`, {
+              headers: { "X-Requested-With": "XMLHttpRequest" },
+            });
+            const data = await response.json();
+
+            if (data.username) {
+              document.getElementById("username").value = data.username;
+              document.getElementById("fullname").value = data.fullname;
+              document.getElementById("email").value = data.email;
+              document.getElementById("phone").value = data.phone || "";
+              document.getElementById("address").value = data.address || "";
+              document.getElementById("bio").value = data.bio || "";
+            }
+          } catch (error) {
+            console.error("Error fetching profile:", error);
+          }
+        }
+
+        await fetchProfile();
+
+        const profileForm = document.getElementById("profileForm");
+        if (profileForm) {
+          profileForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const fullname = document.getElementById("fullname").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            const address = document.getElementById("address").value.trim();
+            const bio = document.getElementById("bio").value.trim();
+
+            // **🔹 Validation Rules Based on DB Schema**
+            if (!fullname || fullname.length > 100) {
+              alert("Full Name is required and must be within 100 characters.");
+              return;
+            }
+
+            if (
+              !email ||
+              email.length > 100 ||
+              !/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email)
+            ) {
+              alert("Enter a valid Email (max 100 characters).");
+              return;
+            }
+
+            if (phone && !/^\d{10}$/.test(phone)) {
+              alert("Phone number must be exactly 10 digits.");
+              return;
+            }
+
+            if (address && address.length < 5) {
+              alert("Address must be at least 5 characters.");
+              return;
+            }
+
+            try {
+              const response = await fetch("/profile", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ fullname, email, phone, address, bio }),
+              });
+
+              if (response.ok) {
+                alert("Profile updated successfully!");
+                window.location.reload();
+              } else {
+                alert("Failed to update profile.");
+              }
+            } catch (error) {
+              console.error("Error updating profile:", error);
+              alert("An error occurred while updating the profile.");
+            }
+          });
+        }
+      });
+      document.addEventListener("DOMContentLoaded", () => {
+        const resetPasswordForm = document.getElementById("profileForm");
+
+        if (resetPasswordForm) {
+          resetPasswordForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const currentPassword = resetPasswordForm
+              .querySelector('input[name="currentPassword"]')
+              .value.trim();
+            const newPassword = resetPasswordForm
+              .querySelector('input[name="newPassword"]')
+              .value.trim();
+
+            if (!currentPassword || !newPassword) {
+              alert("Please fill in both fields.");
+              return;
+            }
+
+            fetch("/reset_password", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                current_password: currentPassword,
+                new_password: newPassword,
+              }),
+            })
+              .then((response) => response.json())
+              .then((result) => {
+                alert(result.message);
+                if (result.success) {
+                  window.location.href = "/profile";
+                }
+              })
+              .catch((error) => console.error("Error:", error));
+          });
+        }
+      });
+    </script>
   </body>
 </html>
