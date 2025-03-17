@@ -108,6 +108,7 @@
         await fetchProfile();
 
         const profileForm = document.getElementById("profileForm");
+
         if (profileForm) {
           profileForm.addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -118,7 +119,18 @@
             const address = document.getElementById("address").value.trim();
             const bio = document.getElementById("bio").value.trim();
 
-            // **🔹 Validation Rules Based on DB Schema**
+            const currentPassword = profileForm
+              .querySelector('input[name="currentPassword"]')
+              .value.trim();
+            const newPassword = profileForm
+              .querySelector('input[name="newPassword"]')
+              .value.trim();
+
+            if (currentPassword || newPassword) {
+              await handlePasswordChange(currentPassword, newPassword);
+              return;
+            }
+
             if (!fullname || fullname.length > 100) {
               alert("Full Name is required and must be within 100 characters.");
               return;
@@ -163,44 +175,34 @@
           });
         }
       });
-      document.addEventListener("DOMContentLoaded", () => {
-        const resetPasswordForm = document.getElementById("profileForm");
 
-        if (resetPasswordForm) {
-          resetPasswordForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-
-            const currentPassword = resetPasswordForm
-              .querySelector('input[name="currentPassword"]')
-              .value.trim();
-            const newPassword = resetPasswordForm
-              .querySelector('input[name="newPassword"]')
-              .value.trim();
-
-            if (!currentPassword || !newPassword) {
-              alert("Please fill in both fields.");
-              return;
-            }
-
-            fetch("/reset_password", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                current_password: currentPassword,
-                new_password: newPassword,
-              }),
-            })
-              .then((response) => response.json())
-              .then((result) => {
-                alert(result.message);
-                if (result.success) {
-                  window.location.href = "/profile";
-                }
-              })
-              .catch((error) => console.error("Error:", error));
-          });
+      async function handlePasswordChange(currentPassword, newPassword) {
+        if (!currentPassword || !newPassword) {
+          alert("Please enter both current and new passwords.");
+          return;
         }
-      });
+
+        try {
+          const response = await fetch("/reset_password", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              current_password: currentPassword,
+              new_password: newPassword,
+            }),
+          });
+
+          const result = await response.json();
+          alert(result.message);
+
+          if (result.success) {
+            window.location.href = "/profile";
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("An error occurred while changing the password.");
+        }
+      }
     </script>
   </body>
 </html>
