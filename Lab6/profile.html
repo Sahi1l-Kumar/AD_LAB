@@ -38,31 +38,72 @@
             </div>
           </div>
           <div class="input-group">
-            <label>Full Name</label>
-            <input type="text" value="John Doe" required />
+            <label>Username</label>
+            <input type="text" name="username" value="john_doe" readonly />
           </div>
           <div class="input-group">
-            <label>Username</label>
-            <input type="text" value="johndoe123" required />
+            <label>Full Name</label>
+            <input type="text" name="fullname" value="John Doe" required />
           </div>
           <div class="input-group">
             <label>Email</label>
-            <input type="email" value="john.doe@example.com" required />
+            <input
+              type="email"
+              name="email"
+              value="john.doe@example.com"
+              required
+            />
           </div>
           <div class="input-group">
-            <label>Student ID</label>
-            <input type="text" value="STU2024001" readonly />
+            <label>Phone</label>
+            <input type="tel" name="phone" value="555-123-4567" />
+          </div>
+          <div class="input-group">
+            <label>Address</label>
+            <textarea name="address" rows="3">
+123 Main St, Anytown, CA 94001</textarea
+            >
+          </div>
+          <div class="input-group">
+            <label>Bio</label>
+            <textarea name="bio" rows="4">
+Computer Science student with interest in AI and machine learning.</textarea
+            >
           </div>
           <div class="input-group">
             <label>Current Password</label>
-            <input type="password" placeholder="Enter current password" />
+            <input
+              type="password"
+              name="currentPassword"
+              placeholder="Enter current password"
+            />
           </div>
           <div class="input-group">
             <label>New Password</label>
-            <input type="password" placeholder="Enter new password" />
+            <input
+              type="password"
+              name="newPassword"
+              placeholder="Enter new password"
+            />
           </div>
           <button type="submit" class="submit-btn">Save Changes</button>
         </form>
+      </div>
+
+      <div class="documents-card">
+        <h2>My Documents</h2>
+        <div class="documents-list">
+          <div class="document-item">
+            <h3>Database Project Proposal</h3>
+            <p>Uploaded: Nov 10, 2024</p>
+            <a href="#" class="document-link">View Document</a>
+          </div>
+          <div class="document-item">
+            <h3>Resume</h3>
+            <p>Uploaded: Nov 15, 2024</p>
+            <a href="#" class="document-link">View Document</a>
+          </div>
+        </div>
       </div>
     </div>
     <script src="styles/navbar.js"></script>
