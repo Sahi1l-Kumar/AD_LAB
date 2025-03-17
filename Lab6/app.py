@@ -169,7 +169,6 @@ def reset_password():
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
-    # Fetch stored hashed password
     cursor.execute('SELECT password FROM users WHERE id = %s',
                    (session['id'],))
     user = cursor.fetchone()
@@ -177,11 +176,9 @@ def reset_password():
     if not user or not bcrypt.checkpw(current_password.encode('utf-8'), user['password'].encode('utf-8')):
         return jsonify({'success': False, 'message': 'Current password is incorrect'})
 
-    # Hash the new password
     hashed_new_password = bcrypt.hashpw(
         new_password.encode('utf-8'), bcrypt.gensalt())
 
-    # Update password in DB
     cursor.execute('UPDATE users SET password = %s WHERE id = %s',
                    (hashed_new_password, session['id']))
     mysql.connection.commit()
