@@ -60,14 +60,19 @@
     resize: vertical;
     min-height: 100px;
     color: #1f2937;
-    background: #f9fafb;
-    transition: all 0.2s ease;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+#queryInput::placeholder {
+    color: #9ca3af;
+    opacity: 1;
 }
 
 #queryInput:focus {
     outline: none;
     border-color: #2563eb;
-    background: white;
+    transform: translateY(-2px);
 }
 
 .submit-query-btn {
@@ -84,15 +89,26 @@
     border-radius: 0.5rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .submit-query-btn:hover {
     background: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.submit-query-btn:active {
+    transform: translateY(0);
 }
 
 .btn-icon {
     font-size: 1.25rem;
+    transition: transform 0.3s ease;
+}
+
+.submit-query-btn:hover .btn-icon {
+    transform: translateX(5px);
 }
 
 /* Response Container */
