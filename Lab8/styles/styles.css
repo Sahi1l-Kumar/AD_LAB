@@ -1,0 +1,79 @@
+/* styles/styles.css */
+body {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.comment-card {
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pagination {
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.loader {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+    margin: 20px auto;
+    display: none;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.sentiment-tag {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    margin-left: 10px;
+}
+
+.sentiment-positive {
+    background-color: #28a745;
+}
+
+.sentiment-neutral {
+    background-color: #6c757d;
+}
+
+.sentiment-negative {
+    background-color: #dc3545;
+}
+
+.sentiment-summary {
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+.sentiment-badge {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    color: white;
+}
+
+.sentiment-badge.positive {
+    background-color: #28a745;
+}
+
+.sentiment-badge.neutral {
+    background-color: #6c757d;
+}
+
+.sentiment-badge.negative {
+    background-color: #dc3545;
+}

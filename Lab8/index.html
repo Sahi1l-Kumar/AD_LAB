@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube Comment Analyzer</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link href="/styles/styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center mb-4">YouTube Comment Analyzer</h1>
+
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="card mb-4">
+            <div class="card-body">
+              <form id="commentForm">
+                <div class="mb-3">
+                  <label for="videoUrl" class="form-label"
+                    >YouTube Video URL</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="videoUrl"
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="commentCount" class="form-label"
+                    >Number of Comments to Fetch</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="commentCount"
+                    min="1"
+                    max="500"
+                    value="100"
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Fetch Comments
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div id="loader" class="loader"></div>
+
+          <div id="results" style="display: none">
+            <h2 id="videoTitle" class="text-center mb-3"></h2>
+
+            <div class="card mb-4">
+              <div class="card-body">
+                <div
+                  class="d-flex justify-content-between align-items-center mb-3"
+                >
+                  <div>
+                    <span id="currentPage"></span> of
+                    <span id="totalPages"></span> pages (<span
+                      id="totalComments"
+                    ></span>
+                    comments total)
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <label for="pageSize" class="me-2"
+                      >Comments per page:</label
+                    >
+                    <select
+                      id="pageSize"
+                      class="form-select form-select-sm"
+                      style="width: auto"
+                    >
+                      <option value="5">5</option>
+                      <option value="10" selected>10</option>
+                      <option value="20">20</option>
+                      <option value="50">50</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="sentiment-summary mb-3">
+                  <div class="row text-center">
+                    <div class="col">
+                      <div class="sentiment-badge positive">
+                        <span id="positiveCount">0</span> Positive
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="sentiment-badge neutral">
+                        <span id="neutralCount">0</span> Neutral
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="sentiment-badge negative">
+                        <span id="negativeCount">0</span> Negative
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="commentsList" class="mb-4"></div>
+
+            <nav aria-label="Comments pagination">
+              <ul class="pagination" id="pagination"></ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/styles/script.js"></script>
+  </body>
+</html>
