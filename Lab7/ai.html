@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Assistant - Student Portal</title>
+    <link rel="stylesheet" href="styles/styles.css" />
+    <link rel="stylesheet" href="styles/dashboard.css" />
+    <link rel="stylesheet" href="styles/ai.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+    />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-content">
+        <h1>Student Dashboard</h1>
+        <button class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="nav-links">
+          <a href="/grades">Grades</a>
+          <a href="/profile">Profile</a>
+          <a href="/ai" class="active">AI</a>
+          <a href="/">Logout</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="dashboard-container">
+      <div class="ai-query-card">
+        <h2>Ask AI Assistant</h2>
+        <div class="model-selector">
+          <button class="model-btn active" data-model="deepseek">
+            <span class="model-icon">🧠</span>
+            Deepseek
+          </button>
+          <button class="model-btn" data-model="gemini">
+            <span class="model-icon">🤖</span>
+            Gemini
+          </button>
+          <button class="model-btn" data-model="groq">
+            <span class="model-icon">⚡</span>
+            Groq
+          </button>
+        </div>
+
+        <div class="query-input-container">
+          <textarea
+            id="queryInput"
+            placeholder="Ask anything about your courses, grades, or academic topics..."
+            rows="4"
+          ></textarea>
+          <button id="submitQuery" class="submit-query-btn">
+            <span class="btn-text">Ask AI</span>
+            <span class="btn-icon">→</span>
+          </button>
+        </div>
+
+        <div class="response-container hidden">
+          <div class="response-header">
+            <div class="model-info">
+              <span class="model-icon"></span>
+              <span class="model-name"></span>
+            </div>
+            <button class="copy-btn" title="Copy response">
+              <span class="copy-icon">📋</span>
+            </button>
+          </div>
+          <div class="response-content">
+            <div class="loading-indicator hidden">
+              <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <p>AI is thinking...</p>
+            </div>
+            <div id="responseText"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="styles/navbar.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const queryInput = document.getElementById("queryInput");
+        const submitQueryBtn = document.getElementById("submitQuery");
+        const responseContainer = document.querySelector(".response-container");
+        const responseText = document.getElementById("responseText");
+        const loadingIndicator = document.querySelector(".loading-indicator");
+        const modelButtons = document.querySelectorAll(".model-btn");
+        const modelInfo = document.querySelector(".model-info");
+        let selectedModel = "deepseek";
+
+        modelButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            modelButtons.forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            selectedModel = btn.getAttribute("data-model");
+          });
+        });
+
+        submitQueryBtn.addEventListener("click", async () => {
+          const query = queryInput.value.trim();
+          if (!query) return;
+
+          responseText.innerHTML = "";
+          responseContainer.classList.remove("hidden");
+          loadingIndicator.classList.remove("hidden");
+
+          // Update model info in the response header
+          const modelName = document.querySelector(".model-name");
+          modelName.textContent =
+            selectedModel.charAt(0).toUpperCase() + selectedModel.slice(1);
+
+          // Set the appropriate icon based on the model
+          const modelIcon = document.querySelector(".model-info .model-icon");
+          if (selectedModel === "deepseek") modelIcon.textContent = "🧠";
+          else if (selectedModel === "gemini") modelIcon.textContent = "🤖";
+          else if (selectedModel === "groq") modelIcon.textContent = "⚡";
+
+          try {
+            const response = await fetch("/query", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ query, model: selectedModel }),
+            });
+
+            const data = await response.json();
+            loadingIndicator.classList.add("hidden");
+
+            if (data.sql) {
+              // Changed from data.sql_query to data.sql
+              // Display the SQL query
+              let formattedResponse = `<h3>SQL Query:</h3>
+        <pre><code class="sql">${data.sql}</code></pre>`;
+
+              // Display the results if available
+              if (data.results && data.results.length > 0) {
+                formattedResponse += `<h3>Results:</h3>
+          <div class="results-table">
+            <table>
+              <thead>
+                <tr>
+                  ${Object.keys(data.results[0])
+                    .map((key) => `<th>${key}</th>`)
+                    .join("")}
+                </tr>
+              </thead>
+              <tbody>
+                ${data.results
+                  .map(
+                    (row) => `
+                  <tr>
+                    ${Object.values(row)
+                      .map(
+                        (value) => `<td>${value !== null ? value : "NULL"}</td>`
+                      )
+                      .join("")}
+                  </tr>
+                `
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+          </div>`;
+              } else if (data.results) {
+                formattedResponse += `<p>Query executed successfully, but no results were returned.</p>`;
+              }
+
+              responseText.innerHTML = formattedResponse;
+              hljs.highlightAll();
+            } else if (data.error) {
+              responseText.innerHTML = `<p class="error">${data.error}</p>`;
+            }
+          } catch (error) {
+            loadingIndicator.classList.add("hidden");
+            responseText.innerHTML = `<p class="error">Failed to fetch response. Please try again.</p>`;
+            console.error("Error:", error);
+          }
+        });
+
+        // Add functionality for the copy button
+        const copyBtn = document.querySelector(".copy-btn");
+        copyBtn.addEventListener("click", () => {
+          const textToCopy = responseText.innerText;
+          navigator.clipboard
+            .writeText(textToCopy)
+            .then(() => {
+              copyBtn.setAttribute("title", "Copied!");
+              setTimeout(
+                () => copyBtn.setAttribute("title", "Copy response"),
+                2000
+              );
+            })
+            .catch((err) => console.error("Failed to copy:", err));
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Profile - Grading System</title>
+    <link rel="stylesheet" href="styles/styles.css" />
+    <link rel="stylesheet" href="styles/dashboard.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-content">
+        <h1>Student Dashboard</h1>
+        <button class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="nav-links">
+          <a href="/grades">Grades</a>
+          <a href="/profile" class="active">Profile</a>
+          <a href="/ai">AI</a>
+          <a href="/">Logout</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="dashboard-container">
+      <div class="profile-card">
+        <h2>Edit Profile</h2>
+        <form id="profileForm">
+          <div class="input-group">
+            <label>Profile Picture</label>
+            <div class="profile-picture">
+              <img
+                src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=150&h=150&fit=crop"
+                alt="Profile"
+              />
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Username</label>
+            <input type="text" id="username" name="username" readonly />
+          </div>
+          <div class="input-group">
+            <label>Full Name</label>
+            <input type="text" id="fullname" name="fullname" required />
+          </div>
+          <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+          <div class="input-group">
+            <label>Phone</label>
+            <input type="tel" id="phone" name="phone" />
+          </div>
+          <div class="input-group">
+            <label>Address</label>
+            <textarea id="address" name="address" rows="3"></textarea>
+          </div>
+          <div class="input-group">
+            <label>Bio</label>
+            <textarea id="bio" name="bio" rows="4"></textarea>
+          </div>
+          <div class="input-group">
+            <label>Current Password</label>
+            <input
+              type="password"
+              name="currentPassword"
+              placeholder="Enter current password"
+            />
+          </div>
+          <div class="input-group">
+            <label>New Password</label>
+            <input
+              type="password"
+              name="newPassword"
+              placeholder="Enter new password"
+            />
+          </div>
+          <button type="submit" class="submit-btn">Save Changes</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="styles/navbar.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        async function fetchProfile() {
+          try {
+            const response = await fetch(`/profile`, {
+              headers: { "X-Requested-With": "XMLHttpRequest" },
+            });
+            const data = await response.json();
+
+            if (data.username) {
+              document.getElementById("username").value = data.username;
+              document.getElementById("fullname").value = data.fullname;
+              document.getElementById("email").value = data.email;
+              document.getElementById("phone").value = data.phone || "";
+              document.getElementById("address").value = data.address || "";
+              document.getElementById("bio").value = data.bio || "";
+            }
+          } catch (error) {
+            console.error("Error fetching profile:", error);
+          }
+        }
+
+        await fetchProfile();
+
+        const profileForm = document.getElementById("profileForm");
+
+        if (profileForm) {
+          profileForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const fullname = document.getElementById("fullname").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            const address = document.getElementById("address").value.trim();
+            const bio = document.getElementById("bio").value.trim();
+
+            const currentPassword = profileForm
+              .querySelector('input[name="currentPassword"]')
+              .value.trim();
+            const newPassword = profileForm
+              .querySelector('input[name="newPassword"]')
+              .value.trim();
+
+            if (currentPassword || newPassword) {
+              await handlePasswordChange(currentPassword, newPassword);
+              return;
+            }
+
+            if (!fullname || fullname.length > 100) {
+              alert("Full Name is required and must be within 100 characters.");
+              return;
+            }
+
+            if (
+              !email ||
+              email.length > 100 ||
+              !/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email)
+            ) {
+              alert("Enter a valid Email (max 100 characters).");
+              return;
+            }
+
+            if (phone && !/^\d{10}$/.test(phone)) {
+              alert("Phone number must be exactly 10 digits.");
+              return;
+            }
+
+            if (address && address.length < 5) {
+              alert("Address must be at least 5 characters.");
+              return;
+            }
+
+            try {
+              const response = await fetch("/profile", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ fullname, email, phone, address, bio }),
+              });
+
+              if (response.ok) {
+                alert("Profile updated successfully!");
+                window.location.reload();
+              } else {
+                alert("Failed to update profile.");
+              }
+            } catch (error) {
+              console.error("Error updating profile:", error);
+              alert("An error occurred while updating the profile.");
+            }
+          });
+        }
+      });
+
+      async function handlePasswordChange(currentPassword, newPassword) {
+        if (!currentPassword || !newPassword) {
+          alert("Please enter both current and new passwords.");
+          return;
+        }
+
+        try {
+          const response = await fetch("/reset_password", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              current_password: currentPassword,
+              new_password: newPassword,
+            }),
+          });
+
+          const result = await response.json();
+          alert(result.message);
+
+          if (result.success) {
+            window.location.href = "/profile";
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("An error occurred while changing the password.");
+        }
+      }
+    </script>
+  </body>
+</html>
