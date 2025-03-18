@@ -188,8 +188,19 @@ def reset_password():
 
 @app.route('/logout')
 def logout():
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    session.pop('username', None)
     session.clear()
     return redirect('/')
+
+
+@app.after_request
+def add_header(response):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "-1"
+    return response
 
 
 if __name__ == '__main__':

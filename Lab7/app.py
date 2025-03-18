@@ -52,11 +52,11 @@ def get_ollama_response(query):
     try:
         response = requests.post(OLLAMA_API_URL, json=payload)
         response.raise_for_status()
-        # Extract the SQL query directly from the response
+
         sql_query = response.json()["response"].strip()
-        # Ensure the response is ONLY the SQL query
+
         if not sql_query.startswith("SELECT") and not sql_query.startswith("INSERT") and not sql_query.startswith("UPDATE") and not sql_query.startswith("DELETE"):
-            return ""  # Return empty string if the response is not a valid SQL query
+            return ""
         return sql_query
     except requests.exceptions.ConnectionError:
         raise Exception(
@@ -67,23 +67,20 @@ def get_ollama_response(query):
 
 def extract_sql_query(text):
     """Extract SQL query from AI response text."""
-    # Try to extract SQL between SQL code blocks
+
     sql_block_pattern = re.compile(r"```sql\s*(.*?)\s*```", re.DOTALL)
     code_block_pattern = re.compile(r"```\s*(.*?)\s*```", re.DOTALL)
 
-    # Look for SQL-specific code blocks first
     sql_match = sql_block_pattern.search(text)
     if sql_match:
         return sql_match.group(1).strip()
 
-    # Then look for any code blocks
     code_match = code_block_pattern.search(text)
     if code_match:
         return code_match.group(1).strip()
 
-    # If no code blocks found, check for SQL statements
     sql_patterns = [
-        # Match common SQL keywords patterns
+
         re.compile(
             r"(?i)(SELECT\s+.*?FROM\s+.*?(?:WHERE|GROUP BY|ORDER BY|LIMIT|;|$).*)", re.DOTALL),
         re.compile(r"(?i)(INSERT\s+INTO\s+.*?VALUES\s+.*?(?:;|$).*)", re.DOTALL),
@@ -96,7 +93,6 @@ def extract_sql_query(text):
         if match:
             return match.group(1).strip()
 
-    # If everything else fails, return the text as is, assuming it's already a SQL query
     return text.strip()
 
 
@@ -110,7 +106,6 @@ except Exception as e:
 def process_nlq(query, model="deepseek"):
     """Process natural language query using the specified model."""
 
-    # Define the schema context for the AI to reference
     schema_context = """
     Database Schema:
     - users (id INT PRIMARY KEY, username VARCHAR(50), password VARCHAR(255), email VARCHAR(100), fullname VARCHAR(100), created_at TIMESTAMP, updated_at TIMESTAMP)
@@ -131,7 +126,6 @@ def process_nlq(query, model="deepseek"):
     4. "Show my profile details" -> SELECT u.username, u.email, u.fullname, ud.phone, ud.address, ud.bio FROM users u LEFT JOIN user_details ud ON u.id = ud.user_id WHERE u.id = [current_user_id]
     """
 
-    # Create a detailed prompt that includes the schema
     prompt = f"""
     You are an AI assistant that converts natural language queries into SQL queries for a student grade management system.
     
@@ -187,7 +181,7 @@ def process_nlq(query, model="deepseek"):
 
 def validate_sql_query(query):
     """Basic validation to ensure the query is safe to execute."""
-    # Disallow certain dangerous SQL operations
+
     dangerous_operations = [
         r"(?i)DROP\s+",
         r"(?i)DELETE\s+",
@@ -205,14 +199,13 @@ def validate_sql_query(query):
         r"(?i)LOAD\s+DATA"
     ]
 
-    # For student grade application, we should generally only allow SELECTs
     if not re.search(r"(?i)^SELECT", query.strip()):
         raise ValueError("Only SELECT queries are allowed")
 
     for pattern in dangerous_operations:
         if re.search(pattern, query):
             raise ValueError(
-                f"Potentially dangerous operation detected in query")
+                "Potentially dangerous operation detected in query")
 
     return True
 
@@ -382,6 +375,8 @@ def reset_password():
 
 @app.route('/ai')
 def ai_page():
+    if 'loggedin' not in session:
+        return redirect('/')
     return render_template('ai.html')
 
 
@@ -402,18 +397,14 @@ def query():
         sql_query = process_nlq(nl_query, model)
         print(f"Generated SQL query: {sql_query}")
 
-        # Replace placeholder with actual session ID
         sql_query = sql_query.replace('[current_user_id]', str(session['id']))
 
-        # Validate the SQL query for safety
         validate_sql_query(sql_query)
 
-        # Execute the query
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute(sql_query)
         results = cursor.fetchall()
 
-        # Return both the SQL query and the results
         return jsonify({
             'sql': sql_query,
             'results': results
@@ -432,8 +423,19 @@ def query():
 
 @app.route('/logout')
 def logout():
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    session.pop('username', None)
     session.clear()
     return redirect('/')
+
+
+@app.after_request
+def add_header(response):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "-1"
+    return response
 
 
 if __name__ == '__main__':
