@@ -1,29 +1,109 @@
-/* styles/styles.css */
+/* General styles */
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2c3e50;
+    --positive-color: #2ecc71;
+    --neutral-color: #f39c12;
+    --negative-color: #e74c3c;
+    --bg-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --text-color: #333333;
+    --border-color: #dddddd;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    padding: 20px;
 }
 
-.comment-card {
-    margin-bottom: 1rem;
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 20px;
+    background-color: var(--secondary-color);
+    color: white;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.pagination {
-    justify-content: center;
-    margin-top: 2rem;
+header h1 {
+    margin-bottom: 10px;
+    font-size: 2.2rem;
 }
 
-.loader {
-    border: 5px solid #f3f3f3;
-    border-top: 5px solid #3498db;
+/* Form styles */
+.form-container {
+    background-color: var(--card-bg);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+/* Loading spinner */
+.loading-container {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    margin: 40px 0;
+}
+
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
     border-radius: 50%;
+    border-top: 4px solid var(--primary-color);
     width: 50px;
     height: 50px;
-    animation: spin 2s linear infinite;
-    margin: 20px auto;
-    display: none;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
 }
 
 @keyframes spin {
@@ -31,49 +111,187 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-.sentiment-tag {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
+/* Results section */
+.results-container {
+    display: none;
+}
+
+.summary-section, .comments-section {
+    background-color: var(--card-bg);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: var(--secondary-color);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+/* Sentiment chart and stats */
+.sentiment-chart {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.chart-container {
+    flex: 1;
+    min-width: 300px;
+    height: 300px;
+}
+
+.sentiment-stats {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.stat-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.positive-bg {
+    background-color: var(--positive-color);
+}
+
+.neutral-bg {
+    background-color: var(--neutral-color);
+}
+
+.negative-bg {
+    background-color: var(--negative-color);
+}
+
+/* Video preview */
+.video-preview {
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+.video-preview iframe {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border: none;
+    border-radius: 8px;
+}
+
+/* Filter controls */
+.filter-controls {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filter-btn {
+    background-color: #e9ecef;
+    color: var(--text-color);
+    padding: 8px 16px;
+    font-weight: normal;
+}
+
+.filter-btn:hover {
+    background-color: #dee2e6;
+}
+
+.filter-btn.active {
+    background-color: var(--primary-color);
     color: white;
-    margin-left: 10px;
+}
+
+/* Comments list */
+.comments-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.comment-card {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    border-left: 5px solid;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.comment-card.positive {
+    border-left-color: var(--positive-color);
+}
+
+.comment-card.neutral {
+    border-left-color: var(--neutral-color);
+}
+
+.comment-card.negative {
+    border-left-color: var(--negative-color);
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.comment-author {
+    font-weight: 600;
+}
+
+.comment-sentiment {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: capitalize;
 }
 
 .sentiment-positive {
-    background-color: #28a745;
-}
-
-.sentiment-neutral {
-    background-color: #6c757d;
-}
-
-.sentiment-negative {
-    background-color: #dc3545;
-}
-
-.sentiment-summary {
-    padding: 10px;
-    border-radius: 8px;
-    background-color: #f8f9fa;
-}
-
-.sentiment-badge {
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-weight: bold;
+    background-color: var(--positive-color);
     color: white;
 }
 
-.sentiment-badge.positive {
-    background-color: #28a745;
+.sentiment-neutral {
+    background-color: var(--neutral-color);
+    color: white;
 }
 
-.sentiment-badge.neutral {
-    background-color: #6c757d;
+.sentiment-negative {
+    background-color: var(--negative-color);
+    color: white;
 }
 
-.sentiment-badge.negative {
-    background-color: #dc3545;
+.comment-metadata {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 15px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .comments-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .sentiment-chart {
+        flex-direction: column;
+    }
 }

@@ -1,185 +1,274 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 import os
+import re
+import time
+import asyncio
 from dotenv import load_dotenv
-from typing import List, Dict, Any, Optional
-import math
-from fastapi.middleware.cors import CORSMiddleware
+from googleapiclient.discovery import build
+from typing import List, Dict, Any
 import google.generativeai as genai
-import groq
+from groq import AsyncGroq
+import logging
+import json
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 load_dotenv(".env.local")
-YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+app = FastAPI()
 
 
-AI_MODEL = "gemini"
-
-
-if GEMINI_API_KEY and AI_MODEL == "gemini":
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-2.0-flash')
-
-
-if GROQ_API_KEY and AI_MODEL == "groq":
-    groq_client = groq.Client(api_key=GROQ_API_KEY)
-
-app = FastAPI(title="YouTube Comment Analyzer")
-
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-templates = Jinja2Templates(directory=".")
 app.mount("/styles", StaticFiles(directory="styles"), name="styles")
+templates = Jinja2Templates(directory=".")
 
 
-class CommentRequest(BaseModel):
-    video_url: str
-    comment_count: int = 100
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
+youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
 
-class Comment(BaseModel):
-    author: str
-    text: str
-    sentiment: str
-    like_count: int
-    published_at: str
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 
-class CommentResponse(BaseModel):
-    comments: List[Comment]
-    total_comments: int
-    total_pages: int
-    current_page: int
-    page_size: int
-    video_title: str
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+    gemini_model = genai.GenerativeModel('gemini-2.0-flash')
 
 
-def extract_video_id(url: str) -> str:
-    if "youtube.com/watch?v=" in url:
-        return url.split("youtube.com/watch?v=")[1].split("&")[0]
-    elif "youtu.be/" in url:
-        return url.split("youtu.be/")[1].split("?")[0]
-    else:
-        raise ValueError("Invalid YouTube URL")
+if GROQ_API_KEY:
+    groq_client = AsyncGroq(api_key=GROQ_API_KEY)
 
 
-async def analyze_sentiment(text: str) -> str:
-    try:
-        if AI_MODEL == "gemini" and GEMINI_API_KEY:
-            response = model.generate_content(
-                f"Analyze the sentiment of this YouTube comment as 'positive', 'neutral', or 'negative'. Only return the sentiment label. Comment: {text}"
-            )
-            sentiment = response.text.strip().lower()
-
-            if sentiment not in ["positive", "neutral", "negative"]:
-                return "neutral"
-            return sentiment
-
-        elif AI_MODEL == "groq" and GROQ_API_KEY:
-            response = groq_client.chat.completions.create(
-                model="llama3-8b-8192",
-                messages=[
-                    {"role": "system", "content": "You are a sentiment analysis assistant. Respond with only 'positive', 'neutral', or 'negative'."},
-                    {"role": "user", "content": f"Analyze the sentiment of this YouTube comment: {text}"}
-                ],
-                max_tokens=10
-            )
-            sentiment = response.choices[0].message.content.strip().lower()
-
-            if sentiment not in ["positive", "neutral", "negative"]:
-                return "neutral"
-            return sentiment
-
-        else:
-
-            positive_words = ["good", "great", "awesome",
-                              "amazing", "love", "excellent", "best", "perfect"]
-            negative_words = ["bad", "terrible", "awful", "hate",
-                              "worst", "horrible", "poor", "disappointing"]
-
-            text_lower = text.lower()
-            pos_count = sum(1 for word in positive_words if word in text_lower)
-            neg_count = sum(1 for word in negative_words if word in text_lower)
-
-            if pos_count > neg_count:
-                return "positive"
-            elif neg_count > pos_count:
-                return "negative"
-            else:
-                return "neutral"
-    except Exception as e:
-        print(f"Sentiment analysis error: {str(e)}")
-        return "neutral"
+MIN_REQUEST_INTERVAL = 1
 
 
-async def fetch_youtube_comments(video_id: str, max_results: int = 100):
-    youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
+last_request_time = {
+    "gemini": 0,
+    "groq": 0
+}
 
-    video_response = youtube.videos().list(
-        part='snippet',
-        id=video_id
-    ).execute()
 
-    if not video_response['items']:
-        raise HTTPException(status_code=404, detail="Video not found")
+def extract_video_id(url):
+    """Extract YouTube video ID from URL"""
 
-    video_title = video_response['items'][0]['snippet']['title']
+    patterns = [
+        r'(?:v=|\/)([0-9A-Za-z_-]{11}).*',
+        r'(?:embed\/)([0-9A-Za-z_-]{11})',
+        r'(?:youtu\.be\/)([0-9A-Za-z_-]{11})'
+    ]
 
+    for pattern in patterns:
+        match = re.search(pattern, url)
+        if match:
+            return match.group(1)
+
+    raise ValueError("Invalid YouTube URL")
+
+
+async def fetch_comments(video_id: str, max_comments: int) -> List[dict]:
+    """Fetch comments from a YouTube video"""
     comments = []
     next_page_token = None
 
-    while len(comments) < max_results:
-        try:
-            response = youtube.commentThreads().list(
-                part='snippet',
+    try:
+        while len(comments) < max_comments:
+
+            request = youtube.commentThreads().list(
+                part="snippet",
                 videoId=video_id,
-                maxResults=min(100, max_results - len(comments)),
-                pageToken=next_page_token
-            ).execute()
+                maxResults=min(100, max_comments - len(comments)
+                               ),
+                pageToken=next_page_token,
+                textFormat="plainText"
+            )
+
+            response = request.execute()
 
             for item in response['items']:
                 comment = item['snippet']['topLevelComment']['snippet']
-                comment_text = comment['textDisplay']
-
-                sentiment = await analyze_sentiment(comment_text)
-
                 comments.append({
                     'author': comment['authorDisplayName'],
-                    'text': comment_text,
-                    'sentiment': sentiment,
-                    'like_count': comment['likeCount'],
+                    'text': comment['textDisplay'],
+                    'likes': comment['likeCount'],
                     'published_at': comment['publishedAt']
                 })
 
-            if 'nextPageToken' in response and len(comments) < max_results:
-                next_page_token = response['nextPageToken']
-            else:
+            next_page_token = response.get('nextPageToken')
+            if not next_page_token or len(comments) >= max_comments:
                 break
 
-        except HttpError as e:
-            if e.resp.status == 403:
-                raise HTTPException(
-                    status_code=403, detail="Comments are disabled for this video")
-            else:
-                raise HTTPException(
-                    status_code=500, detail=f"YouTube API error: {str(e)}")
+        return comments[:max_comments]
 
-    return comments[:max_results], video_title
+    except Exception as e:
+        logger.error(f"Error fetching comments: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error fetching comments: {str(e)}")
+
+
+async def rate_limit_request(api_name):
+    """Implement rate limiting to avoid 429 errors"""
+    current_time = time.time()
+    elapsed = current_time - last_request_time[api_name]
+
+    if elapsed < MIN_REQUEST_INTERVAL:
+        wait_time = MIN_REQUEST_INTERVAL - elapsed
+        await asyncio.sleep(wait_time)
+
+    last_request_time[api_name] = time.time()
+
+
+async def analyze_batch_with_gemini(comments_batch: List[Dict]) -> List[str]:
+    """Analyze a batch of comments with Gemini API"""
+    await rate_limit_request("gemini")
+
+    try:
+
+        comments_text = "\n".join(
+            [f"Comment {i+1}: {comment['text']}" for i, comment in enumerate(comments_batch)])
+
+        prompt = f"""
+        Analyze the sentiment of each of the following {len(comments_batch)} YouTube comments.
+        For each comment, classify it as 'positive', 'neutral', or 'negative'.
+        
+        {comments_text}
+        
+        Respond in JSON format with comment numbers as keys and sentiment as values:
+        {{
+          "1": "positive",
+          "2": "negative",
+          ...
+        }}
+        
+        Only return the JSON object, nothing else.
+        """
+
+        response = gemini_model.generate_content(prompt)
+        response_text = response.text.strip()
+
+        if response_text.startswith("```json"):
+            response_text = response_text.split("```json")[1]
+        if response_text.endswith("```"):
+            response_text = response_text.split("```")[0]
+
+        response_text = response_text.strip()
+        if not response_text.startswith("{"):
+
+            start_idx = response_text.find("{")
+            end_idx = response_text.rfind("}") + 1
+            if start_idx >= 0 and end_idx > start_idx:
+                response_text = response_text[start_idx:end_idx]
+
+        results = json.loads(response_text)
+
+        sentiments = []
+        for i in range(len(comments_batch)):
+            sentiment = results.get(str(i+1), "neutral").lower()
+            if sentiment not in ["positive", "neutral", "negative"]:
+                sentiment = "neutral"
+            sentiments.append(sentiment)
+
+        return sentiments
+
+    except Exception as e:
+        logger.error(f"Error with Gemini API batch: {e}")
+
+        return ["neutral"] * len(comments_batch)
+
+
+async def analyze_batch_with_groq(comments_batch: List[Dict]) -> List[str]:
+    """Analyze a batch of comments with Groq API"""
+    await rate_limit_request("groq")
+
+    try:
+
+        comments_text = "\n".join(
+            [f"Comment {i+1}: {comment['text']}" for i, comment in enumerate(comments_batch)])
+
+        response = await groq_client.chat.completions.create(
+            model="llama3-8b-8192",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a sentiment analysis assistant. You will receive multiple YouTube comments. Analyze each comment and classify it as 'positive', 'neutral', or 'negative'. Return results as a JSON object."
+                },
+                {
+                    "role": "user",
+                    "content": f"""
+                    Analyze the sentiment of each of the following {len(comments_batch)} YouTube comments.
+                    
+                    {comments_text}
+                    
+                    Return a JSON object with comment numbers as keys and sentiment values ('positive', 'neutral', or 'negative'):
+                    {{
+                      "1": "positive",
+                      "2": "negative",
+                      ...
+                    }}
+                    Only return the JSON object, nothing else.
+                    """
+                }
+            ],
+            max_tokens=1000
+        )
+
+        response_text = response.choices[0].message.content.strip()
+
+        if response_text.startswith("```json"):
+            response_text = response_text.split("```json")[1]
+        if response_text.endswith("```"):
+            response_text = response_text.split("```")[0]
+
+        response_text = response_text.strip()
+        if not response_text.startswith("{"):
+
+            start_idx = response_text.find("{")
+            end_idx = response_text.rfind("}") + 1
+            if start_idx >= 0 and end_idx > start_idx:
+                response_text = response_text[start_idx:end_idx]
+
+        results = json.loads(response_text)
+
+        sentiments = []
+        for i in range(len(comments_batch)):
+            sentiment = results.get(str(i+1), "neutral").lower()
+            if sentiment not in ["positive", "neutral", "negative"]:
+                sentiment = "neutral"
+            sentiments.append(sentiment)
+
+        return sentiments
+
+    except Exception as e:
+        logger.error(f"Error with Groq API batch: {e}")
+
+        return ["neutral"] * len(comments_batch)
+
+
+async def batch_analyze_sentiment(comments: List[dict], model: str, batch_size: int = 10) -> List[dict]:
+    """Analyze sentiment in real batches for efficiency and to avoid rate limits"""
+    results = []
+
+    for i in range(0, len(comments), batch_size):
+        batch = comments[i:i + batch_size]
+
+        if model.lower() == "gemini" and GEMINI_API_KEY:
+            batch_sentiments = await analyze_batch_with_gemini(batch)
+        else:
+            batch_sentiments = await analyze_batch_with_groq(batch)
+
+        for j, sentiment in enumerate(batch_sentiments):
+            if i + j < len(comments):
+                results.append({
+                    **batch[j],
+                    "sentiment": sentiment
+                })
+
+    return results
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -187,31 +276,46 @@ async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.post("/api/comments/")
-async def get_comments(request: CommentRequest, page: int = 1, page_size: int = 10):
+@app.post("/analyze")
+async def analyze(
+    request: Request,
+    video_url: str = Form(...),
+    comment_count: int = Form(...),
+    model: str = Form(...)
+):
     try:
-        video_id = extract_video_id(request.video_url)
-        comments, video_title = await fetch_youtube_comments(video_id, request.comment_count)
 
-        total_comments = len(comments)
-        total_pages = math.ceil(total_comments / page_size)
-        current_page = min(page, total_pages) if total_pages > 0 else 1
+        video_id = extract_video_id(video_url)
 
-        start_idx = (current_page - 1) * page_size
-        end_idx = start_idx + page_size
-        paginated_comments = comments[start_idx:end_idx]
+        comments = await fetch_comments(video_id, comment_count)
+
+        max_comments_to_process = min(len(comments), 100)
+        if max_comments_to_process < len(comments):
+            logger.warning(
+                f"Limiting analysis to {max_comments_to_process} comments to avoid API rate limits")
+
+        comments_to_process = comments[:max_comments_to_process]
+
+        batch_size = 20
+        analyzed_comments = await batch_analyze_sentiment(comments_to_process, model, batch_size)
+
+        sentiment_counts = {
+            "positive": sum(1 for c in analyzed_comments if c["sentiment"] == "positive"),
+            "neutral": sum(1 for c in analyzed_comments if c["sentiment"] == "neutral"),
+            "negative": sum(1 for c in analyzed_comments if c["sentiment"] == "negative")
+        }
 
         return {
-            "comments": paginated_comments,
-            "total_comments": total_comments,
-            "total_pages": total_pages,
-            "current_page": current_page,
-            "page_size": page_size,
-            "video_title": video_title
+            "video_id": video_id,
+            "comments": analyzed_comments,
+            "stats": sentiment_counts
         }
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn
