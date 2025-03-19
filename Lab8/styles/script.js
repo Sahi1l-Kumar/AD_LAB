@@ -78,12 +78,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function embedVideo(videoId) {
     videoPreviewElement.innerHTML = `
-      <iframe 
-        src="https:
-        allowfullscreen
-        title="YouTube video player"
-      ></iframe>
-    `;
+            <iframe 
+                src="https://www.youtube.com/embed/${videoId}" 
+                allowfullscreen
+                title="YouTube video player"
+            ></iframe>
+        `;
   }
 
   function displaySentimentStats(stats) {
