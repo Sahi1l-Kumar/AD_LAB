@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="static/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <header>
+        <h1>Expense Tracker</h1>
+        <nav>
+          <button class="nav-btn active" data-view="dashboard">
+            Dashboard
+          </button>
+          <button class="nav-btn" data-view="transactions">Transactions</button>
+          <button class="nav-btn" data-view="reports">Reports</button>
+        </nav>
+      </header>
+
+      <main>
+        <!-- File Upload Section -->
+        <section id="upload-section" class="card">
+          <div class="upload-container" id="dropZone">
+            <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" hidden />
+            <div class="upload-content">
+              <i class="upload-icon">📁</i>
+              <p>Drag & drop your expense file or click to browse</p>
+              <button class="upload-btn">Choose File</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Dashboard View -->
+        <section id="dashboard-view" class="view active">
+          <div class="summary-cards">
+            <div class="summary-card">
+              <h3>Total Expenses</h3>
+              <p id="totalExpenses">₹0.00</p>
+            </div>
+            <div class="summary-card">
+              <h3>Monthly Average</h3>
+              <p id="monthlyAverage">₹0.00</p>
+            </div>
+            <div class="summary-card">
+              <h3>Top Category</h3>
+              <p id="topCategory">-</p>
+            </div>
+            <div class="summary-card">
+              <h3>Total Transactions</h3>
+              <p id="totalTransactions">0</p>
+            </div>
+          </div>
+
+          <div class="charts-grid">
+            <div class="chart-card">
+              <h3>Expense Distribution</h3>
+              <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3>Monthly Trend</h3>
+              <div class="chart-container">
+                <canvas id="lineChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3>Category Breakdown</h3>
+              <div class="chart-container">
+                <canvas id="barChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3>Monthly Category Breakdown</h3>
+              <div class="chart-container">
+                <canvas id="stackedChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="unusual-expenses card">
+            <h3>Unusual Expenses</h3>
+            <div id="unusualExpensesList"></div>
+          </div>
+        </section>
+
+        <!-- Transactions View -->
+        <section id="transactions-view" class="view">
+          <div class="filters">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search descriptions..."
+            />
+            <select id="categoryFilter">
+              <option value="All">All Categories</option>
+            </select>
+            <div class="date-filters">
+              <input type="month" id="startDate" />
+              <input type="month" id="endDate" />
+            </div>
+          </div>
+
+          <div class="transactions-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  <th>Category</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="transactionsBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Reports View -->
+        <section id="reports-view" class="view">
+          <div class="report-controls">
+            <select id="reportType">
+              <option value="monthly">Monthly Report</option>
+              <option value="yearly">Yearly Report</option>
+            </select>
+            <input type="month" id="reportDate" />
+            <button id="generateReport">Generate Report</button>
+          </div>
+          <div id="reportContent" class="card"></div>
+        </section>
+      </main>
+    </div>
+    <script src="static/main.js"></script>
+  </body>
+</html>

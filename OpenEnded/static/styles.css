@@ -1,0 +1,425 @@
+:root {
+    --primary-color: #2563eb;
+    --secondary-color: #3b82f6;
+    --background-color: #f3f4f6;
+    --card-background: #ffffff;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+.app-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+nav {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.nav-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: var(--card-background);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.nav-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.card {
+    background-color: var(--card-background);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+
+.upload-container {
+    border: 2px dashed var(--border-color);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.upload-container.drag-over {
+    border-color: var(--primary-color);
+    background-color: rgba(37, 99, 235, 0.05);
+}
+
+.upload-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.file-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--primary-color);
+    border-radius: 0.5rem;
+    max-width: 100%;
+    color: white;
+}
+
+.file-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+    font-weight: 500;
+}
+
+.clear-file {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.25rem;
+    font-size: 1.5rem;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.clear-file:hover {
+    opacity: 1;
+}
+
+.upload-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    font-weight: 500;
+    min-width: 150px;
+}
+
+
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.summary-card {
+    background-color: var(--card-background);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.summary-card h3 {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.summary-card p {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.chart-card {
+    background-color: var(--card-background);
+    padding: 1rem; 
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    height: auto; 
+}
+
+.chart-card h3 {
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.chart-container {
+    height: auto; 
+}
+
+
+.filters {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.filters input,
+.filters select {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    width: 100%;
+    max-width: 300px;
+}
+
+.date-filters {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.date-filters input {
+    flex: 1;
+    min-width: 150px;
+}
+
+.transactions-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -1rem;
+    padding: 0 1rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--card-background);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    min-width: 600px;
+}
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+
+.report-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.report-controls select,
+.report-controls input {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    width: 100%;
+    max-width: 200px;
+}
+
+#generateReport {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    width: 100%;
+    max-width: 200px;
+}
+
+#reportContent {
+    text-align: center;
+}
+
+.report-summary {
+    margin: 1.5rem 0;
+}
+
+.category-breakdown {
+    text-align: left;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.category-breakdown ul {
+    list-style: none;
+    margin-top: 1rem;
+}
+
+.category-breakdown li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+}
+
+
+.view {
+    display: none;
+}
+
+.view.active {
+    display: block;
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.view.active {
+    animation: fadeIn 0.3s ease-out;
+}
+
+
+@media (max-width: 768px) {
+    .app-container {
+        padding: 0.5rem;
+    }
+
+    nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .nav-btn {
+        flex: 1;
+        min-width: 100px;
+        font-size: 0.9rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .summary-cards {
+        grid-template-columns: 1fr; 
+        gap: 1rem; 
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr; 
+        gap: 1rem; 
+    }
+
+    .chart-card {
+        height: auto; 
+        padding: 0.75rem; 
+    }
+
+    .chart-container {
+        height: auto; 
+        width: 100%; 
+    }
+
+    .file-preview {
+        width: 100%;
+    }
+
+    .file-name {
+        max-width: calc(100% - 3rem);
+    }
+
+    .summary-cards {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filters input,
+    .filters select {
+        max-width: none;
+    }
+
+    .date-filters {
+        flex-direction: column;
+    }
+
+    .date-filters input {
+        max-width: none;
+    }
+
+    .report-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .report-controls select,
+    .report-controls input,
+    #generateReport {
+        max-width: none;
+    }
+
+    th, td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.9rem;
+    }
+}
